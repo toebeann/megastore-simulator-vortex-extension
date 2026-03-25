@@ -2,7 +2,7 @@
 
 ## Features
 
-- Provides support to [Vortex] for Megastore Simulator.
+- Provides support for Megastore Simulator to [Vortex].
 - Automatically detects mod types and installs them to the appropriate locations e.g. BepInEx pack, BepInEx plugins, config files, etc.
 - Detects when the game has been updated and informs you that mods might need to be updated.
 - Provides easy access to Megastore Simulator's save folder, BepInEx log file and more through the "Open..." button of the Mods tab.
