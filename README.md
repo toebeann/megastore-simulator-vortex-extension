@@ -14,7 +14,7 @@
 
 Assuming you have [Vortex] installed, you should be able to simply click the Vortex button at the top of the Nexus Mods page to open this extension within Vortex, and then click `Install`, restarting Vortex when prompted.
 
-If that doesn't work for whatever reason, you can alternatively install the extension manually by manually downloading the main file, and then you can simply drag-and-drop it into the "Drop File(s)" area at the bottom of the Extensions tab in Vortex, restarting Vortex when prompted.
+If that doesn't work for whatever reason, you can alternatively install the extension manually by downloading the main file, and then you can simply drag-and-drop it into the "Drop File(s)" area at the bottom of the Extensions tab in Vortex, restarting Vortex when prompted.
 
 ## How can I make my mod compatible with this extension?
 
