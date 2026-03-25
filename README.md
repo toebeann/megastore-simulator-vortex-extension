@@ -12,9 +12,9 @@
 > [!WARNING]
 > This extension was developed against [Vortex Mod Manager] v1.16.7, and as such I recommend you have at least this version of Vortex installed. I cannot guarantee this extension will function correctly for older versions.
 
-Assuming you have [Vortex] installed, you should be able to simply click the Vortex button at the top of the Nexus Mods page to open this extension within Vortex, and then click `Install`, and restart Vortex when prompted.
+Assuming you have [Vortex] installed, you should be able to simply click the Vortex button at the top of the Nexus Mods page to open this extension within Vortex, and then click `Install`, restarting Vortex when prompted.
 
-If that doesn't work for whatever reason, you can also install the extension manually by manually downloading the main file, and then you can simply drag-and-drop it into the "Drop File(s)" area at the bottom of the Extensions tab in Vortex, restarting Vortex when prompted.
+If that doesn't work for whatever reason, you can alternatively install the extension manually by manually downloading the main file, and then you can simply drag-and-drop it into the "Drop File(s)" area at the bottom of the Extensions tab in Vortex, restarting Vortex when prompted.
 
 ## How can I make my mod compatible with this extension?
 
