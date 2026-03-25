@@ -10,7 +10,7 @@
 ## How to install
 
 > [!WARNING]
-> This extension was developed against [Vortex Mod Manager] 1.16.7, and as such I recommend you have at least this version of Vortex installed or else I cannot guarantee this Vortex extension will work properly.
+> This extension was developed against [Vortex Mod Manager] v1.16.7, and as such I recommend you have at least this version of Vortex installed or else I cannot guarantee this Vortex extension will work properly.
 
 Assuming you have [Vortex] installed, you should be able to simply click the Vortex button at the top of the Nexus Mods page to open this extension within Vortex, and then click `Install`, and restart Vortex when prompted.
 
