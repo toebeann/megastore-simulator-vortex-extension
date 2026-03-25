@@ -1,0 +1,151 @@
+using AssetsTools.NET.Extra;
+using Microsoft.JavaScript.NodeApi;
+using System.Diagnostics;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
+using System.Text.Json;
+
+namespace DotNetUtils;
+
+[JSExport]
+public static class Utils
+{
+    public static string? GetApplicationVersion(string gameDataPath, string tpkPath)
+    {
+        var manager = new AssetsManager();
+        var instance = gameDataPath switch
+        {
+            string path when File.Exists(Path.Combine(path, "globalgamemanagers")) =>
+                manager.LoadAssetsFile(Path.Combine(path, "globalgamemanagers")),
+
+            string path when File.Exists(Path.Combine(path, "mainData")) =>
+                manager.LoadAssetsFile(Path.Combine(path, "mainData")),
+
+            string path => manager.LoadAssetsFileFromBundle(
+                manager.LoadBundleFile(Path.Combine(path, "data.unity3d")),
+                "globalgamemanagers"),
+        };
+
+        manager.LoadClassPackage(tpkPath);
+
+        if (!instance.file.Metadata.TypeTreeEnabled)
+            manager.LoadClassDatabaseFromPackage(instance.file.Metadata.UnityVersion);
+
+        var playerSettings = instance.file.GetAssetsOfType(AssetClassID.PlayerSettings).First();
+        var baseField = manager.GetBaseField(instance, playerSettings);
+
+        var result = baseField?.Get("bundleVersion") switch
+        {
+            { TypeName: "string", AsString: var str } => str,
+            _ => null
+        };
+
+        manager.UnloadAll(true);
+        return result;
+    }
+
+    public static string GetFileVersionInfo(string path) => JsonSerializer.Serialize(FileVersionInfo.GetVersionInfo(path), SourceGenerationContext.Default.FileVersionInfo);
+
+    private static string? GetFullName(CustomAttribute attribute, MetadataReader reader)
+    {
+        switch (attribute.Constructor.Kind)
+        {
+            case HandleKind.MethodDefinition:
+                {
+                    MethodDefinition methodDefinition = reader.GetMethodDefinition((MethodDefinitionHandle)attribute.Constructor);
+                    TypeDefinition typeDefinition = reader.GetTypeDefinition(methodDefinition.GetDeclaringType());
+                    string @namespace = reader.GetString(typeDefinition.Namespace);
+                    string name = reader.GetString(typeDefinition.Name);
+                    return $"{@namespace}.{name}";
+                }
+
+            case HandleKind.MemberReference:
+                MemberReference memberReference = reader.GetMemberReference((MemberReferenceHandle)attribute.Constructor);
+
+                switch (memberReference.Parent.Kind)
+                {
+                    case HandleKind.TypeReference:
+                        {
+                            TypeReference typeReference = reader.GetTypeReference((TypeReferenceHandle)memberReference.Parent);
+                            string @namespace = reader.GetString(typeReference.Namespace);
+                            string name = reader.GetString(typeReference.Name);
+                            return $"{@namespace}.{name}";
+                        }
+
+                    case HandleKind.TypeDefinition:
+                        {
+                            TypeDefinition typeDefinition = reader.GetTypeDefinition((TypeDefinitionHandle)memberReference.Parent);
+                            string @namespace = reader.GetString(typeDefinition.Namespace);
+                            string name = reader.GetString(typeDefinition.Name);
+                            return $"{@namespace}.{name}";
+                        }
+                }
+                break;
+        }
+
+        return null;
+    }
+
+    private static IEnumerable<TypeRef> GetBiePluginTypes(MetadataReader reader) =>
+        reader.TypeDefinitions
+            .Select(reader.GetTypeDefinition)
+            .Where(type => type.GetCustomAttributes()
+                .Any(attr => GetFullName(reader.GetCustomAttribute(attr), reader)?.StartsWith("BepInEx.BepInPlugin") ?? false))
+            .Select(type => new TypeRef(type, reader));
+
+    private static IEnumerable<TypeRef> GetBie5PatcherTypes(MetadataReader reader) =>
+        reader.TypeDefinitions
+            .Select(reader.GetTypeDefinition)
+            .Where(type => type.GetProperties()
+                .Any(prop => reader.GetString(reader.GetPropertyDefinition(prop).Name) == "TargetDLLs")
+                    && type.GetMethods()
+                        .Any(method => reader.GetString(reader.GetMethodDefinition(method).Name) == "Patch"))
+            .Select(type => new TypeRef(type, reader));
+
+    private static IEnumerable<TypeRef> GetBie6PatcherTypes(MetadataReader reader) =>
+        reader.TypeDefinitions
+            .Select(reader.GetTypeDefinition)
+            .Where(type => type.GetCustomAttributes()
+                .Any(attr => GetFullName(reader.GetCustomAttribute(attr), reader) is string name
+                    && name.StartsWith("BepInEx.") && name.EndsWith(".PatcherPluginInfoAttribute")))
+            .Select(type => new TypeRef(type, reader));
+
+    private static IEnumerable<AssemblyRef> GetAssemblyReferences(MetadataReader reader) =>
+        reader.AssemblyReferences
+            .Select(r => (AssemblyRef)reader.GetAssemblyReference(r).GetAssemblyName());
+
+    private static IEnumerable<AssemblyRef> GetBepInExAssemblyReferences(IEnumerable<AssemblyRef> references) =>
+        references.Where(static r => r.Name?.StartsWith("BepInEx") ?? false);
+
+    public static string AnalyzeAssembly(string path)
+    {
+        using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using var peReader = new PEReader(fs);
+        MetadataReader reader = peReader.GetMetadataReader();
+        var definition = reader.GetAssemblyDefinition();
+        var references = GetAssemblyReferences(reader);
+        var bepinex = GetBepInExAssemblyReferences(references);
+        var result = new AssemblyAnalysis(
+           Assembly: definition.GetAssemblyName(),
+
+           BepInExAssemblies: [.. bepinex],
+
+           BepInExPatcherTypes: bepinex switch
+           {
+               _ when bepinex.Any(static a => a.Version?.Major == 6) => [.. GetBie6PatcherTypes(reader)],
+
+               _ when bepinex.Any(static a => a.Name == "BepInEx" && a.Version?.Major == 5) => [.. GetBie5PatcherTypes(reader)],
+
+               _ => [],
+           },
+
+           BepInExPluginTypes: bepinex.Any(static a => a.Version?.Major == 5 || a.Version?.Major == 6) switch
+           {
+               true => [.. GetBiePluginTypes(reader)],
+
+               false => [],
+           });
+
+        return JsonSerializer.Serialize(result, SourceGenerationContext.Default.AssemblyAnalysis);
+    }
+}

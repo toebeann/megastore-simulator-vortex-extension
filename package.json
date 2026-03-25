@@ -1,0 +1,79 @@
+{
+  "name": "megastore-simulator-vortex-extension",
+  "version": "1.0.0",
+  "description": "Vortex support for Megastore Simulator",
+  "license": "MPL-2.0",
+  "author": "toebeann",
+  "homepage": "https://github.com/toebeann/megastore-simulator-vortex-extension",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toebeann/megastore-simulator-vortex-extension.git"
+  },
+  "bugs": {
+    "url": "https://github.com/toebeann/megastore-simulator-vortex-extension/issues"
+  },
+  "config": {
+    "issueTracker": "https://github.com/toebeann/megastore-simulator-vortex-extension/issues"
+  },
+  "funding": [
+    "https://github.com/toebeann/megastore-simulator-vortex-extension?sponsor=1",
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/toebeann"
+    },
+    {
+      "type": "kofi",
+      "url": "https://ko-fi.com/toebean_"
+    },
+    {
+      "type": "paypal",
+      "url": "https://paypal.me/tobeyblaber"
+    }
+  ],
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "postinstall": "bun tpk --no-update",
+    "install:7zip": "where 7z >/dev/null || bun winget 7zip.7zip --no-upgrade",
+    "install:dotnet": "powershell -NoProfile -NoLogo -NonInteractive -c 'if (((dotnet --list-sdks | select-string ^9. | select -expand line) | measure-object | select -expand count) -lt 1) { bun winget Microsoft.DotNet.SDK.9 --no-upgrade }'",
+    "build:dotnet": "bun install:dotnet; dotnet publish -r win-x64 ./DotNetUtils",
+    "prebuild": "rm -r dist; mkdir dist",
+    "build": "bun build:dotnet && extractInfo && bun build.ts",
+    "postbuild": "bun bundle",
+    "prebundle": "rm $npm_package_name.7z* 2>/dev/null; cp LICENSE ./dist/LICENSE",
+    "bundle": "bun install:7zip; 7z a -t7z -x!meta.md $npm_package_name.7z ./dist/**/*",
+    "predev": "bun postinstall && bun prebuild",
+    "dev": "extractInfo && bun build.ts --features DEVTOOLS",
+    "postdev": "bun postbuild",
+    "predev:full": "bun postinstall",
+    "dev:full": "bun run build --features DEVTOOLS",
+    "predist": "bun tpk",
+    "dist": "bun run build --drop console --drop debugger --no-sourcemap"
+  },
+  "dependencies": {
+    "isbinaryfile": "^6.0.0",
+    "shell-quote": "^1.8.3",
+    "steam-acf-parser": "github:mattb-prg/steam-acf-parser",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@nexusmods/nexus-api": "^1.1.5",
+    "@total-typescript/ts-reset": "^0.6.1",
+    "@types/bun": "1.3.11",
+    "@types/fs-extra": "^9.0.13",
+    "@types/semver": "^7.7.1",
+    "@types/shell-quote": "^1.7.5",
+    "jszip": "^3.10.1",
+    "node-api-dotnet": "^0.9.19",
+    "store2": "^2.14.4",
+    "vortex-api": "github:Nexus-Mods/vortex-api"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "engines": {
+    "bun": "^1.3.11"
+  },
+  "os": ["win32"]
+}
