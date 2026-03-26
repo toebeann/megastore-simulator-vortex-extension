@@ -35,8 +35,10 @@ import { getAllMods, getDiscovery } from "./util/vortex";
 
 import { GAME_EXE, GAME_NAME, NEXUS_GAME_ID, STEAM_GAME_ID } from "./constants";
 
-const { ensureDirWritableAsync } = fs;
-const { currentGame, discoveryByGame, profileById } = selectors;
+import ensureDirWritableAsync = fs.ensureDirWritableAsync;
+import currentGame = selectors.currentGame;
+import discoveryByGame = selectors.discoveryByGame;
+import profileById = selectors.profileById;
 
 export default function main(context: t.IExtensionContext): boolean {
   context.registerGame({

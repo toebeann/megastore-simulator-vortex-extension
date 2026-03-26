@@ -8,10 +8,12 @@ import { actions, selectors, type types as t, util } from "vortex-api";
 
 import { GAME_NAME, NEXUS_GAME_ID } from "../constants";
 
-const { setModsEnabled: _setModsEnabled } = actions;
-const { currentGame, discoveryByGame, lastActiveProfileForGame, profileById } =
-  selectors;
-const { toPromise } = util;
+import _setModsEnabled = actions.setModsEnabled;
+import currentGame = selectors.currentGame;
+import discoveryByGame = selectors.discoveryByGame;
+import lastActiveProfileForGame = selectors.lastActiveProfileForGame;
+import profileById = selectors.profileById;
+import toPromise = util.toPromise;
 
 export const TRANSLATION_OPTIONS = {
   replace: {

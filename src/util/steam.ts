@@ -12,7 +12,7 @@ import { STEAM_GAME_ID } from "../constants";
 import { getDiscovery } from "./vortex";
 import { nonEmptyStringSchema } from "./zod";
 
-const { readFileAsync } = fs;
+import readFileAsync = fs.readFileAsync;
 
 export const getManifestPath = (
   state: t.IState,

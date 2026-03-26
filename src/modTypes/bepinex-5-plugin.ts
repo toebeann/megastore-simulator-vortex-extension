@@ -15,7 +15,7 @@ import {
 } from "../util/bepinex";
 import { getDiscovery } from "../util/vortex";
 
-const { isChildPath } = util;
+import isChildPath = util.isChildPath;
 
 export const BEPINEX_5_PLUGIN_MOD_TYPE = "bepinex-5-plugin";
 

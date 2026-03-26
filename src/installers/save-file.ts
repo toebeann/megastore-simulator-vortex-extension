@@ -13,8 +13,9 @@ import { SAVE_FILE_MOD_TYPE } from "../modTypes/save-file";
 import { some } from "../util/async";
 import { BEPINEX_CORE_FILES } from "../util/bepinex";
 
-const { installPath } = selectors;
-const { getVortexPath, isChildPath } = util;
+import installPath = selectors.installPath;
+import getVortexPath = util.getVortexPath;
+import isChildPath = util.isChildPath;
 
 export const testSupported = async (
   api: t.IExtensionApi,
