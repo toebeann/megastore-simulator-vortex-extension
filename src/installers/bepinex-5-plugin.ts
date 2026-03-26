@@ -84,8 +84,9 @@ export const testSupported = async (
       .toLowerCase().split(sep).lastIndexOf(BEPINEX_PLUGINS_DIR);
     const rootDir = pluginDir.split(sep).slice(0, rootIndex + 1).join(sep);
 
-    const outsideRoot = sansDirectories
-      .filter((file) => !isChildPath(file, rootDir));
+    const outsideRoot = sansDirectories.filter((file) =>
+      dirname(file) !== rootDir && !isChildPath(file, rootDir)
+    );
 
     // if any binary files found outside BepInEx\plugins, we don't support this archive
     result.supported = !await some(
@@ -122,7 +123,8 @@ export const install = async (
   const rootIndex = pluginDir
     .toLowerCase().split(sep).lastIndexOf(BEPINEX_PLUGINS_DIR);
   const rootDir = pluginDir.split(sep).slice(0, rootIndex + 1).join(sep);
-  const rooted = sansDirectories.filter((file) => isChildPath(file, rootDir));
+  const rooted = sansDirectories
+    .filter((file) => dirname(file) === rootDir || isChildPath(file, rootDir));
 
   const instructions = [
     { type: "setmodtype", value: BEPINEX_5_PLUGIN_MOD_TYPE },

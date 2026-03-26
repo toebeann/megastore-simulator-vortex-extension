@@ -60,8 +60,9 @@ export const testSupported = async (
 
     const saveDir = dirname(saveFile);
 
-    const outsideSaveDir = sansDirectories
-      .filter((file) => !isChildPath(file, saveDir));
+    const outsideSaveDir = sansDirectories.filter((file) =>
+      dirname(file) !== saveDir && !isChildPath(file, saveDir)
+    );
 
     // if any binary files found outside folder containing save file, we don't support this archive
     result.supported = !await some(
@@ -95,7 +96,8 @@ export const install = async (api: t.IExtensionApi, files: string[]) => {
 
   const rootDir = dirname(saveFiles[0]!);
   const rootIndex = rootDir.split(sep).length;
-  const rooted = sansDirectories.filter((file) => isChildPath(file, rootDir));
+  const rooted = sansDirectories
+    .filter((file) => dirname(file) === rootDir || isChildPath(file, rootDir));
 
   const instructions = rooted.map((source): t.IInstruction => ({
     type: "copy",

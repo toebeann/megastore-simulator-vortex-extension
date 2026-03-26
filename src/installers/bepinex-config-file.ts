@@ -68,8 +68,9 @@ export const testSupported = async (
       .toLowerCase().split(sep).lastIndexOf(BEPINEX_CONFIG_DIR);
     const rootDir = configDir.split(sep).slice(0, rootIndex + 1).join(sep);
 
-    const outsideRoot = sansDirectories
-      .filter((file) => !isChildPath(file, rootDir));
+    const outsideRoot = sansDirectories.filter((file) =>
+      dirname(file) !== rootDir && !isChildPath(file, rootDir)
+    );
 
     // if any binary files found outside BepInEx\config, we don't support this archive
     result.supported = !await some(
@@ -94,7 +95,8 @@ export const install = async (files: string[]) => {
   const rootIndex = configDir
     .toLowerCase().split(sep).lastIndexOf(BEPINEX_CONFIG_DIR);
   const rootDir = configDir.split(sep).slice(0, rootIndex + 1).join(sep);
-  const rooted = sansDirectories.filter((file) => isChildPath(file, rootDir));
+  const rooted = sansDirectories
+    .filter((file) => dirname(file) === rootDir || isChildPath(file, rootDir));
 
   const instructions = rooted.map((source): t.IInstruction => ({
     type: "copy",
