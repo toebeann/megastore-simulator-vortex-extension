@@ -13,7 +13,7 @@ import { NEXUS_GAME_ID } from "../constants";
 import { SAVE_FILE_MOD_TYPE } from "../modTypes/save-file";
 import { some } from "../util/async";
 import { BEPINEX_CORE_FILES } from "../util/bepinex";
-import { getSaveFolder } from "../util/getSaveFileFolder";
+import { getSaveFolder } from "../util/getSaveFolder";
 import { exec } from "../util/powershell";
 
 import statAsync = fs.statAsync;

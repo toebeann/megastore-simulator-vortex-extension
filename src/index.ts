@@ -31,7 +31,7 @@ import {
   BEPINEX_MOD_PATH,
   validateBepInEx,
 } from "./util/bepinex";
-import { getSaveFolder } from "./util/getSaveFileFolder";
+import { getSaveFolder } from "./util/getSaveFolder";
 import { getAllMods, getDiscovery } from "./util/vortex";
 
 import {
