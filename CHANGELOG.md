@@ -4,7 +4,7 @@
 
 ### Added
 
-- Implement installer to handle save files
+- Implement installer to handle save files ([`102581f`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/102581f))
     - Handles archives containing files named e.g. `Save_0.data`, `Save_1.data` etc.
     - Archive must not contain binary data outside of the folder containing the save file(s)
     - Supports up to 4 save files in a single archive
