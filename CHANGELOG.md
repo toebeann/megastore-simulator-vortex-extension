@@ -5,6 +5,8 @@
 ### Added
 
 - Implement a changelog GUI to let users know what has changed in each update ([`6cf59e5`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/6cf59e5))
+    - Changelog GUI can be opened from the mods tab in the action bar or via a notification when a new update is installed
+    - GUI will automatically open whenever an important update has been installed (e.g. breaking change, major version bump)
 
 ### Fixed
 
