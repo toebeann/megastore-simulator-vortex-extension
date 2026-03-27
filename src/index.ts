@@ -23,14 +23,14 @@ import registerModTypeBepInEx5Plugin from "./modTypes/bepinex-5-plugin";
 import registerModTypeBepInExConfigFile from "./modTypes/bepinex-config-file";
 import registerModTypeSaveFile from "./modTypes/save-file";
 
+import { setup as dotnetSetup } from "./dotnet";
+import { getGameVersion } from "./dotnet/getGameVersion";
 import {
   BEPINEX_CONFIG_DIR_PATH,
   BEPINEX_LOG_FILE_PATH,
   BEPINEX_MOD_PATH,
   validateBepInEx,
 } from "./util/bepinex";
-import { setup as dotnetSetup } from "./util/dotnet";
-import { getGameVersion } from "./util/getGameVersion";
 import { getSaveFolder } from "./util/getSaveFileFolder";
 import { getAllMods, getDiscovery } from "./util/vortex";
 

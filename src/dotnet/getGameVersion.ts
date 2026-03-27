@@ -18,10 +18,10 @@ import {
   fileVersionInfoCodec,
   getApplicationVersion as _getApplicationVersion,
   getFileVersionInfo as _getFileVersionInfo,
-} from "./dotnet";
-import { resolveExtensionPath } from "./resolveExtensionPath";
-import { nonEmptyStringSchema } from "./zod";
-import { exec } from "./powershell";
+} from "../dotnet";
+import { exec } from "../util/powershell";
+import { resolveExtensionPath } from "../util/resolveExtensionPath";
+import { nonEmptyStringSchema } from "../util/zod";
 
 export const getApplicationVersion = (
   gameDataPath: string,

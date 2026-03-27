@@ -9,9 +9,9 @@ import type { types as t } from "vortex-api";
 // @ts-expect-error
 import script from "../../assets/analyzeAssembly.fsx" with { type: "file" };
 
-import { analyzeAssembly, analyzeAssemblyResultCodec } from "./dotnet";
-import { exec } from "./powershell";
-import { resolveExtensionPath } from "./resolveExtensionPath";
+import { exec } from "../util/powershell";
+import { resolveExtensionPath } from "../util/resolveExtensionPath";
+import { analyzeAssembly, analyzeAssemblyResultCodec } from ".";
 
 export const getAssemblyAnalysis = (path: string, api?: t.IExtensionApi) => {
   try {

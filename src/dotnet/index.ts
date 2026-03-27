@@ -22,8 +22,8 @@ import dotnetUtils from "../../DotNetUtils/bin/aot/DotNetUtils.node" with {
 };
 import type { Utils } from "../../DotNetUtils/bin/aot/DotNetUtils";
 
-import { resolveExtensionPath } from "./resolveExtensionPath";
-import { jsonCodec } from "./zod";
+import { resolveExtensionPath } from "../util/resolveExtensionPath";
+import { jsonCodec } from "../util/zod";
 
 const load = (api: t.IExtensionApi) => {
   try {
