@@ -48,7 +48,7 @@ details > ul, details[open] p {
 
 details > ul {
   list-style-type: disc;
-  list-style-position: inside;
+  padding-left: 1.5em;
 }
 
 details > ul > li {
@@ -56,9 +56,9 @@ details > ul > li {
 }
 
 details > ul > li > ul {
-  margin: 1em 1.5em;
   list-style-type: circle;
-  list-style-position: inside;
+  margin-block: 1em;
+  padding-left: 1.5em;
 }
 
 details[open] > summary .expand {
