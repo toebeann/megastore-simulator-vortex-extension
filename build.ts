@@ -33,6 +33,6 @@ build({
   metafile: { markdown: "meta.md" },
   format: "cjs",
   banner,
-  optimizeImports: ["shell-quote"],
+  optimizeImports: ["cheerio", "shell-quote", "store2"],
   ...config,
 });
