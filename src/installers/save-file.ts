@@ -21,7 +21,6 @@ import installPath = selectors.installPath;
 import getVortexPath = util.getVortexPath;
 import isChildPath = util.isChildPath;
 import NotSupportedError = util.NotSupportedError;
-import UserCanceled = util.UserCanceled;
 
 export const validSaveFiles = [
   "Save_0.data",
