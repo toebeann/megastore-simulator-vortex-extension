@@ -33,6 +33,13 @@ import { getGameVersion } from "./util/getGameVersion";
 import { getSaveFolder } from "./util/getSaveFileFolder";
 import { getAllMods, getDiscovery } from "./util/vortex";
 
+import {
+  handle as handleChangelog,
+  migrate,
+  show,
+  store as changelogStore,
+  transform,
+} from "./changelog";
 import { GAME_EXE, GAME_NAME, NEXUS_GAME_ID, STEAM_GAME_ID } from "./constants";
 
 import ensureDirWritableAsync = fs.ensureDirWritableAsync;
@@ -41,6 +48,8 @@ import discoveryByGame = selectors.discoveryByGame;
 import profileById = selectors.profileById;
 
 export default function main(context: t.IExtensionContext): boolean {
+  context.registerMigration(migrate);
+
   context.registerGame({
     id: NEXUS_GAME_ID,
     name: GAME_NAME,
@@ -62,7 +71,9 @@ export default function main(context: t.IExtensionContext): boolean {
     defaultPrimary: true,
     version,
     setup: async (discovery) => {
-      dotnetSetup(context.api);
+      const { api } = context;
+
+      dotnetSetup(api);
 
       if (discovery?.path) {
         const { path } = discovery;
@@ -70,7 +81,8 @@ export default function main(context: t.IExtensionContext): boolean {
           .map((dir) => ensureDirWritableAsync(resolve(path, dir))));
       }
 
-      await validateBepInEx(context.api);
+      await handleChangelog(api);
+      await validateBepInEx(api);
     },
   });
 
@@ -144,6 +156,28 @@ export default function main(context: t.IExtensionContext): boolean {
     },
   );
 
+  context.registerAction(
+    "mod-icons",
+    2000,
+    "changelog",
+    {},
+    "Changelog",
+    () => {
+      const { output, input, latest } = transform();
+      show(
+        context.api,
+        output ?? input,
+        latest,
+        "Megastore Simulator Vortex Extension",
+      );
+    },
+    () => {
+      const state = context.api.getState();
+      const currentGameId = currentGame(state)?.id;
+      return currentGameId === NEXUS_GAME_ID;
+    },
+  );
+
   registerModTypeBepInEx(context);
   registerModTypeBepInEx5Plugin(context);
   registerModTypeSaveFile(context);
@@ -169,10 +203,21 @@ export default function main(context: t.IExtensionContext): boolean {
         [NEXUS_GAME_ID]: {
           context,
           extension: context.api.extension,
+          changelog: {
+            transform,
+            show: (async (
+              config: Parameters<typeof transform>[0],
+              title?: string,
+            ) => {
+              const { output, input, latest } = transform(config);
+              return await show(context.api, output ?? input, latest, title);
+            }),
+          },
           getAllMods: (gameId = NEXUS_GAME_ID) =>
             getAllMods(getState(), gameId),
           getDiscovery,
           getState,
+          stores: { changelog: changelogStore },
           vortex: { actions, fs, selectors, util },
         },
       });

@@ -1,0 +1,158 @@
+import type { types as t } from "vortex-api";
+
+import { load } from "cheerio";
+import { gte, lt, major, valid } from "semver";
+import store2 from "store2";
+import * as z from "zod/mini";
+
+import { EXTENSION_ID } from "../constants";
+import { getHtml } from "./macro" with { type: "macro" };
+
+export const store = store2
+  .namespace(EXTENSION_ID)
+  .namespace("common-changelog")
+  .namespace("draft");
+
+const versionSchema = z.object({
+  version: z.string(),
+  date: z.optional(z.number()),
+});
+type Version = z.infer<typeof versionSchema>;
+
+const LAST_USED = "last-version-used" as const;
+const LAST_SEEN = "last-changelog-seen" as const;
+const FALLBACK_VERSION = "1.0.0" as const;
+const FALLBACK_DATE = "2026-03-25" as const;
+
+const transformConfigSchema = z.object({
+  lastSeen: z._default(
+    versionSchema,
+    () =>
+      versionSchema.safeParse(store(LAST_SEEN)).data ?? {
+        version: FALLBACK_VERSION,
+        date: Date.parse(FALLBACK_DATE),
+      },
+  ),
+  lastUsed: z._default(
+    versionSchema,
+    () =>
+      versionSchema.safeParse(store(LAST_USED)).data ??
+        { version: FALLBACK_VERSION },
+  ),
+});
+type TransformConfig = z.infer<typeof transformConfigSchema>;
+
+export const transform = (config?: Partial<TransformConfig>) => {
+  const { lastSeen, lastUsed } = transformConfigSchema.parse(config || {});
+  store(LAST_SEEN, lastSeen);
+  store(LAST_USED, lastUsed);
+
+  const input = getHtml();
+  const $ = load(input, null, false);
+  let latest: Version = { version: FALLBACK_VERSION };
+  let hasImportantUpdate = false;
+  let changed = false;
+
+  const $details = $("details");
+  const first = $details.first();
+  if (first.length) {
+    const [versionText, dateText] = $("h2", first).text().split(" - ");
+    const version = valid(versionText?.trim() ?? "");
+    if (version) {
+      latest = {
+        version,
+        date: dateText ? Date.parse(dateText.trim()) : undefined,
+      };
+    }
+  }
+
+  const hasUpdate = lt(lastUsed.version, latest.version);
+
+  for (const current of $details) {
+    const [versionText, dateText] =
+      $("h2", current).first().text().split(" - ") ?? [];
+    const version = valid(versionText?.trim() ?? "");
+    const date = Date.parse(dateText?.trim() ?? "");
+
+    const seen = (version && gte(lastSeen.version, version)) ||
+      (lastSeen.date && lastSeen.date >= date);
+
+    if (seen) continue;
+
+    const shouldOpen =
+      // is new major version?
+      (version && lastSeen.version &&
+        major(version) > major(lastSeen.version)) ||
+      // has notice?
+      $("summary + p > em", current).first().text().length ||
+      // has breaking change?
+      $("li > strong:first-of-type", current).filter(() =>
+        $(this).text().toLowerCase().includes("breaking")
+      ).length;
+
+    if (!shouldOpen) continue;
+
+    hasImportantUpdate = true;
+
+    const $current = $(current);
+    if ($current.attr("open")) continue;
+
+    $current.attr("open", "");
+    changed = true;
+  }
+
+  return {
+    latest,
+    hasUpdate,
+    hasImportantUpdate,
+    input,
+    output: changed ? $.root().html() : input,
+  };
+};
+
+export const show = async (
+  api: t.IExtensionApi,
+  htmlText: string,
+  latest: Version,
+  title = "Megastore Simulator Vortex Extension has been updated",
+) =>
+  api.showDialog?.(
+    "info",
+    title,
+    { htmlText },
+    [{
+      label: "I understand",
+      action: () => {
+        store(LAST_SEEN, latest);
+        api.dismissNotification?.("extension-updated");
+      },
+    }],
+  );
+
+export const handle = async (api: t.IExtensionApi) => {
+  const { hasUpdate, latest, output, input, hasImportantUpdate } = transform();
+
+  if (hasUpdate) {
+    store(LAST_USED, latest);
+
+    api.sendNotification?.({
+      id: "extension-updated",
+      type: "success",
+      title: "Extension updated",
+      message: "Megastore Simulator Vortex Extension updated",
+      actions: [{
+        title: "Changelog",
+        action: () => show(api, output ?? input, latest),
+      }],
+    });
+  }
+
+  if (hasImportantUpdate) await show(api, output ?? input, latest);
+};
+
+export const migrate = (version: string) => {
+  const lastUsed: Version = versionSchema.safeParse(store(LAST_USED)).data ??
+    { version: FALLBACK_VERSION };
+
+  if (lt(lastUsed.version, version)) store(LAST_USED, { ...lastUsed, version });
+};

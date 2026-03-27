@@ -52,8 +52,10 @@
     "dist": "bun run build --drop console --drop debugger --no-sourcemap"
   },
   "dependencies": {
+    "cheerio": "^1.2.0",
     "isbinaryfile": "^6.0.0",
     "shell-quote": "^1.8.3",
+    "store2": "^2.14.4",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -66,7 +68,6 @@
     "jszip": "^3.10.1",
     "node-api-dotnet": "^0.9.19",
     "steam-acf-parser": "github:mattb-prg/steam-acf-parser",
-    "store2": "^2.14.4",
     "vortex-api": "github:Nexus-Mods/vortex-api"
   },
   "peerDependencies": {
