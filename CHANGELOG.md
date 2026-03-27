@@ -4,7 +4,7 @@
 
 ### Added
 
-- Implement a changelog GUI to let users know what has changed in each update
+- Implement a changelog GUI to let users know what has changed in each update ([`6cf59e5`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/6cf59e5))
 
 ### Fixed
 
