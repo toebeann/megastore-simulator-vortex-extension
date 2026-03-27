@@ -17,6 +17,7 @@ import { version } from "../package.json";
 import registerInstallerBepInEx from "./installers/bepinex";
 import registerInstallerBepInEx5Plugin from "./installers/bepinex-5-plugin";
 import registerInstallerBepInExConfigFile from "./installers/bepinex-config-file";
+import registerInstallerSaveFile from "./installers/save-file";
 import registerModTypeBepInEx from "./modTypes/bepinex-5";
 import registerModTypeBepInEx5Plugin from "./modTypes/bepinex-5-plugin";
 import registerModTypeBepInExConfigFile from "./modTypes/bepinex-config-file";
@@ -185,10 +186,10 @@ export default function main(context: t.IExtensionContext): boolean {
 
   registerInstallerBepInEx(context);
   registerInstallerBepInEx5Plugin(context);
+  registerInstallerSaveFile(context);
   registerInstallerBepInExConfigFile(context);
 
-  // TODO: register an installer & mod type for save files
-
+  // TODO: register an installer & mod type for bepinex patchers
   // TODO: register a fallback installer & mod type at prio 99 to handle archives that are rooted to the game folder
 
   context.once(() => {

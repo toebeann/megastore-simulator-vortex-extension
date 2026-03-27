@@ -6,6 +6,7 @@
 import type { types as t } from "vortex-api";
 
 import { NEXUS_GAME_ID } from "../constants";
+import { validSaveFiles } from "../installers/save-file";
 import { getSaveFolder } from "../util/getSaveFileFolder";
 
 export const SAVE_FILE_MOD_TYPE = "save-file";
@@ -17,10 +18,10 @@ export const getPath = getSaveFolder;
 export const test = async (
   instructions: t.IInstruction[],
 ): Promise<boolean> => {
-  const validSaveFiles = Array.from({ length: 4 }, (_, i) => `Save_${i}.data`);
-  return instructions.some(({ type, destination }) =>
+  const saveFiles = instructions.filter(({ type, destination }) =>
     type === "copy" && destination && validSaveFiles.includes(destination)
   );
+  return saveFiles.length >= 1 && saveFiles.length <= 4;
 };
 
 export const register = (context: t.IExtensionContext) =>

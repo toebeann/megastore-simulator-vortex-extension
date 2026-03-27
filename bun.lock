@@ -18,10 +18,10 @@
         "@types/fs-extra": "^9.0.13",
         "@types/semver": "^7.7.1",
         "@types/shell-quote": "^1.7.5",
-        "vortex-api": "github:Nexus-Mods/vortex-api",
         "jszip": "^3.10.1",
         "node-api-dotnet": "^0.9.19",
         "steam-acf-parser": "github:mattb-prg/steam-acf-parser",
+        "vortex-api": "github:Nexus-Mods/vortex-api",
       },
       "peerDependencies": {
         "typescript": "^5",

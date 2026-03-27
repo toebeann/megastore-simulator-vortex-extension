@@ -6,16 +6,34 @@
 import { basename, dirname, join, parse, resolve, sep } from "node:path";
 
 import { isBinaryFile } from "isbinaryfile";
-import { selectors, type types as t, util } from "vortex-api";
+import { quote } from "shell-quote";
+import { fs, selectors, type types as t, util } from "vortex-api";
 
 import { NEXUS_GAME_ID } from "../constants";
 import { SAVE_FILE_MOD_TYPE } from "../modTypes/save-file";
 import { some } from "../util/async";
 import { BEPINEX_CORE_FILES } from "../util/bepinex";
+import { getSaveFolder } from "../util/getSaveFileFolder";
+import { exec } from "../util/powershell";
 
+import statAsync = fs.statAsync;
 import installPath = selectors.installPath;
 import getVortexPath = util.getVortexPath;
 import isChildPath = util.isChildPath;
+import NotSupportedError = util.NotSupportedError;
+import UserCanceled = util.UserCanceled;
+
+export const validSaveFiles = [
+  "Save_0.data",
+  "Save_1.data",
+  "Save_2.data",
+  "Save_3.data",
+] as const;
+
+export type ValidSaveFile = typeof validSaveFiles[number];
+
+export const deletedSlotHash =
+  "2E59EE266815625D19A361AE2ACC75720EE239B61FD892F92D1451DC3A977EB8" as const;
 
 export const testSupported = async (
   api: t.IExtensionApi,
@@ -39,14 +57,10 @@ export const testSupported = async (
       return result; // includes bepinex core files, probably a bepinex pack, this installer won't handle that
     }
 
-    const validSaveFiles = Array.from(
-      { length: 4 },
-      (_, i) => `Save_${i}.data`,
-    );
-    const saveFile = sansDirectories
-      .find((file) => validSaveFiles.includes(basename(file)));
+    const saveFiles = sansDirectories
+      .filter((file) => validSaveFiles.includes(basename(file)));
 
-    if (!saveFile) return result; // no CFG files, can't be a bepinex config file
+    if (!saveFiles.length || saveFiles.length > 4) return result; // no save files (or too many), can't be a save file
 
     // get vortex working path of mod being installed
     const id = archivePath && parse(archivePath).name;
@@ -58,7 +72,7 @@ export const testSupported = async (
 
     if (!workingPath) return result; // can't find working path, short circuit and let other installers handle it
 
-    const saveDir = dirname(saveFile);
+    const saveDir = dirname(saveFiles[0]!);
 
     const outsideSaveDir = sansDirectories.filter((file) =>
       dirname(file) !== saveDir && !isChildPath(file, saveDir)
@@ -76,36 +90,80 @@ export const testSupported = async (
   }
 };
 
-interface SaveFileMapping {
-}
-
 export const install = async (api: t.IExtensionApi, files: string[]) => {
+  interface SaveFileMapping {
+    slot: ValidSaveFile;
+    size: number;
+    hash?: string;
+    mtime?: Date;
+    source?: string;
+  }
+
   const sansDirectories = files.filter((file) => !file.endsWith(sep));
 
-  const validSaveFiles = Array.from({ length: 4 }, (_, i) => `Save_${i}.data`);
-  const saveFiles = sansDirectories
-    .filter((file) => validSaveFiles.includes(basename(file)))!;
+  const saveFile = sansDirectories
+    .find((file) => validSaveFiles.includes(basename(file)))!;
 
-  // TODO: check for empty save file slots
-  // if there enough empty save file slots, automatically assign them
-  // and tell the user which slots they have been assigned to
-  //
-  // otherwise, ask the user to decide which save files slots should
-  // be used. probably good to display file size and modification time from
-  // fs.stat.
-
-  const rootDir = dirname(saveFiles[0]!);
+  const rootDir = dirname(saveFile);
   const rootIndex = rootDir.split(sep).length;
   const rooted = sansDirectories
     .filter((file) => dirname(file) === rootDir || isChildPath(file, rootDir));
 
+  const saveSlotMap = new Map(
+    await Promise.all(
+      validSaveFiles.map(
+        async (slot): Promise<[ValidSaveFile, SaveFileMapping]> => {
+          try {
+            const path = resolve(getSaveFolder(), slot);
+            const { size, mtime }: fs.Stats = await statAsync(path);
+            const command = [
+              quote(["Get-FileHash", path]),
+              quote(["Select-Object", "-Expand", "Hash"]),
+            ].join("|");
+            const hash = exec(command).trim();
+            return [slot, { slot, size, hash, mtime }];
+          } catch (e) {
+            console.error(e);
+            return [slot, { slot, size: 0 }]; // if we errored, it probably means the file doesn't exist
+          }
+        },
+      ),
+    ),
+  );
+
+  const emptySlots = saveSlotMap.values()
+    .filter(({ source, size, hash }) =>
+      !source && (size === 0 || hash === deletedSlotHash)
+    ).toArray();
+
+  const saveFiles = rooted.filter((file) =>
+    dirname(file) === rootDir && validSaveFiles.includes(basename(file))
+  );
+
+  if (emptySlots.length >= saveFiles.length) {
+    for (const file of saveFiles) {
+      const slot = emptySlots.shift()!;
+      slot.source = file;
+      saveSlotMap.set(slot.slot, slot);
+    }
+  } else {
+    // TODO: have the user choose which save files to use
+    // or at the very least give some info on why it isn't supported lol
+    throw new NotSupportedError();
+  }
+
+  // TODO: provide some info that steam might complain about local saves not matching what's in the cloud
+  // user should choose local files over cloud if prompted
+
   const instructions = rooted.map((source): t.IInstruction => ({
     type: "copy",
     source,
-    destination: join(
-      dirname(source).split(sep).slice(rootIndex).join(sep),
-      basename(source),
-    ),
+    destination: saveFiles.includes(source)
+      ? saveSlotMap.values().find((slot) => slot.source === source)!.slot
+      : join(
+        dirname(source).split(sep).slice(rootIndex).join(sep),
+        basename(source),
+      ),
   }));
 
   return { instructions } satisfies t.IInstallResult;

@@ -51,6 +51,16 @@ details > ul {
   list-style-position: inside;
 }
 
+details > ul > li {
+  margin-bottom: 1.5em;
+}
+
+details > ul > li > ul {
+  margin: 1em 1.5em;
+  list-style-type: circle;
+  list-style-position: inside;
+}
+
 details[open] > summary .expand {
   rotate: 0deg;
 }
