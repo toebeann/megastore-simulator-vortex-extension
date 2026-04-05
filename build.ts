@@ -1,4 +1,4 @@
-import { build } from "bun";
+import { build, file, write } from "bun";
 
 import { parseArgs } from "node:util";
 
@@ -37,3 +37,13 @@ await build({
   naming: { asset: "[name].[ext]" },
   ...config,
 });
+
+const applicationVersion = file("dist/applicationVersion.fsx");
+const applicationVersionLines = (await applicationVersion.text()).split("\n");
+applicationVersionLines[
+  applicationVersionLines.findIndex((line) =>
+    line.startsWith("#r") && line.includes("AssetsTools.NET")
+  )
+] = '#r "AssetsTools.NET"';
+const applicationVersionText = applicationVersionLines.join("\n");
+await write(applicationVersion, applicationVersionText);
