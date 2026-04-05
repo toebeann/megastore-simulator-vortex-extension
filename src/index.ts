@@ -23,7 +23,7 @@ import registerModTypeBepInEx5Plugin from "./modTypes/bepinex-5-plugin";
 import registerModTypeBepInExConfigFile from "./modTypes/bepinex-config-file";
 import registerModTypeSaveFile from "./modTypes/save-file";
 
-import { setup as dotnetSetup } from "./dotnet";
+import { initialize, setup as dotnetSetup } from "./dotnet";
 import { getGameVersion } from "./dotnet/getGameVersion";
 import {
   BEPINEX_CONFIG_DIR_PATH,
@@ -32,6 +32,7 @@ import {
   validateBepInEx,
 } from "./util/bepinex";
 import { getSaveFolder } from "./util/getSaveFolder";
+import { resolveExtensionPath } from "./util/resolveExtensionPath";
 import { getAllMods, getDiscovery } from "./util/vortex";
 
 import {
@@ -214,6 +215,8 @@ export default function main(context: t.IExtensionContext): boolean {
               return await show(context.api, output ?? input, latest, title);
             }),
           },
+          dotnet: initialize(context.api),
+          resolve: (path: string) => resolveExtensionPath(path, context.api),
           getAllMods: (gameId = NEXUS_GAME_ID) =>
             getAllMods(getState(), gameId),
           getDiscovery,

@@ -16,8 +16,9 @@ import tpk from "../../assets/lz4.tpk" with { type: "file" };
 import { GAME_EXE } from "../constants";
 import {
   fileVersionInfoCodec,
+  fileVersionInfoSchema,
   getApplicationVersion as _getApplicationVersion,
-  getFileVersionInfo as _getFileVersionInfo,
+  initialize,
 } from "../dotnet";
 import { exec } from "../util/powershell";
 import { resolveExtensionPath } from "../util/resolveExtensionPath";
@@ -57,14 +58,18 @@ export const getApplicationVersion = (
   }
 };
 
-export const getFileVersionInfo = (path: string) => {
-  try {
-    if (_getFileVersionInfo) {
-      const result = _getFileVersionInfo(path).trim();
-      return fileVersionInfoCodec.parse(result);
+export const getFileVersionInfo = (path: string, api?: t.IExtensionApi) => {
+  if (api) {
+    try {
+      const dotnet = initialize(api);
+      dotnet.load("System.Diagnostics.FileVersionInfo");
+      return fileVersionInfoSchema.parse(
+        // @ts-expect-error
+        dotnet.System.Diagnostics.FileVersionInfo.GetVersionInfo(path),
+      );
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error);
   }
 
   // fallback: powershell -c `(Get-Item $(path)).VersionInfo | ConvertTo-Json -Compress`

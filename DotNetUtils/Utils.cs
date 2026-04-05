@@ -1,6 +1,5 @@
 using AssetsTools.NET.Extra;
 using Microsoft.JavaScript.NodeApi;
-using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Text.Json;
@@ -43,8 +42,6 @@ public static class Utils
         manager.UnloadAll(true);
         return result;
     }
-
-    public static string GetFileVersionInfo(string path) => JsonSerializer.Serialize(FileVersionInfo.GetVersionInfo(path), SourceGenerationContext.Default.FileVersionInfo);
 
     private static string? GetFullName(CustomAttribute attribute, MetadataReader reader)
     {
@@ -146,6 +143,6 @@ public static class Utils
                false => [],
            });
 
-        return JsonSerializer.Serialize(result, SourceGenerationContext.Default.AssemblyAnalysis);
+        return JsonSerializer.Serialize(result);
     }
 }

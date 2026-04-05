@@ -22,9 +22,9 @@ const { values: config } = parseArgs({
   strict: false,
 });
 
-build({
+await build({
   entrypoints: ["src/index.ts"],
-  outdir: "./dist",
+  outdir: "dist",
   external: Object.values(externals()),
   target: "node",
   sourcemap: "inline",
@@ -34,5 +34,6 @@ build({
   format: "cjs",
   banner,
   optimizeImports: ["cheerio", "shell-quote", "store2"],
+  naming: { asset: "[name].[ext]" },
   ...config,
 });
