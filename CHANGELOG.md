@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1] - 2026-04-05
+
+### Changed
+
+- Make use of installed .NET 9 runtime where available to reduce extension install size ([`5875cbb`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/5875cbb))
+- Use bundled AssetsTools.NET module when falling back to .NET 6 FSX scripting rather than acquiring it from nuget ([`701b1e1`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/701b1e1))
+
 ## [1.1.0] - 2026-03-27
 
 ### Added
@@ -24,3 +31,4 @@ _Initial release 🚀_
 
 [1.0.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.0.0
 [1.1.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.1.0
+[1.1.1]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.1.1
