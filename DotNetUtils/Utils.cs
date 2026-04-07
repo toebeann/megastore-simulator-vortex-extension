@@ -130,20 +130,20 @@ public static class Utils
         var result = new AssemblyAnalysis(
            Assembly: definition.GetAssemblyName(),
 
-           BepInExAssemblies: [.. bepinex],
+           BepInExAssemblies: bepinex,
 
            BepInExPatcherTypes: bepinex switch
            {
-               _ when bepinex.Any(static a => a.Version?.Major == 6) => [.. GetBie6PatcherTypes(reader)],
+               _ when bepinex.Any(static a => a.Version?.Major == 6) => GetBie6PatcherTypes(reader),
 
-               _ when bepinex.Any(static a => a.Name == "BepInEx" && a.Version?.Major == 5) => [.. GetBie5PatcherTypes(reader)],
+               _ when bepinex.Any(static a => a.Name == "BepInEx" && a.Version?.Major == 5) => GetBie5PatcherTypes(reader),
 
                _ => [],
            },
 
            BepInExPluginTypes: bepinex.Any(static a => a.Version?.Major == 5 || a.Version?.Major == 6) switch
            {
-               true => [.. GetBiePluginTypes(reader)],
+               true => GetBiePluginTypes(reader),
 
                false => [],
            });
