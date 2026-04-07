@@ -45,7 +45,7 @@ if (import.meta.main) {
     console.log("done");
   } catch (error) {
     console.warn(
-      `failed to ${exists ? "updating" : "downloading"} ${tpk.name}:`,
+      `failed to ${exists ? "update" : "download"} ${tpk.name}:`,
       error,
     );
   }
