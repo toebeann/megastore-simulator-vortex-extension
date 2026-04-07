@@ -37,7 +37,6 @@ import "../../DotNetUtils/bin/Release/AssetsTools.NET.dll" with { type: "file" }
 
 import { resolveExtensionPath } from "../util/resolveExtensionPath";
 import { jsonCodec } from "../util/zod";
-// import { initialize } from "./init";
 
 let dotnet: typeof net9 | undefined = undefined;
 
