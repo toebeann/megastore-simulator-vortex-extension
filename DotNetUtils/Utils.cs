@@ -88,65 +88,47 @@ public static class Utils
         return null;
     }
 
-    private static IEnumerable<TypeRef> GetBiePluginTypes(MetadataReader reader) =>
-        reader.TypeDefinitions
-            .Select(reader.GetTypeDefinition)
-            .Where(type => type.GetCustomAttributes()
-                .Any(attr => GetFullName(reader.GetCustomAttribute(attr), reader)?.StartsWith("BepInEx.BepInPlugin") ?? false))
-            .Select(type => new TypeRef(type, reader));
-
-    private static IEnumerable<TypeRef> GetBie5PatcherTypes(MetadataReader reader) =>
-        reader.TypeDefinitions
-            .Select(reader.GetTypeDefinition)
-            .Where(type => type.GetProperties()
-                .Any(prop => reader.GetString(reader.GetPropertyDefinition(prop).Name) == "TargetDLLs")
-                    && type.GetMethods()
-                        .Any(method => reader.GetString(reader.GetMethodDefinition(method).Name) == "Patch"))
-            .Select(type => new TypeRef(type, reader));
-
-    private static IEnumerable<TypeRef> GetBie6PatcherTypes(MetadataReader reader) =>
-        reader.TypeDefinitions
-            .Select(reader.GetTypeDefinition)
-            .Where(type => type.GetCustomAttributes()
-                .Any(attr => GetFullName(reader.GetCustomAttribute(attr), reader) is string name
-                    && name.StartsWith("BepInEx.") && name.EndsWith(".PatcherPluginInfoAttribute")))
-            .Select(type => new TypeRef(type, reader));
-
-    private static IEnumerable<AssemblyRef> GetAssemblyReferences(MetadataReader reader) =>
-        reader.AssemblyReferences
-            .Select(r => (AssemblyRef)reader.GetAssemblyReference(r).GetAssemblyName());
-
-    private static IEnumerable<AssemblyRef> GetBepInExAssemblyReferences(IEnumerable<AssemblyRef> references) =>
-        references.Where(static r => r.Name?.StartsWith("BepInEx") ?? false);
-
     public static string AnalyzeAssembly(string path)
     {
         using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var peReader = new PEReader(fs);
         MetadataReader reader = peReader.GetMetadataReader();
         var definition = reader.GetAssemblyDefinition();
-        var references = GetAssemblyReferences(reader);
-        var bepinex = GetBepInExAssemblyReferences(references);
+        var references = reader.AssemblyReferences.Select(r => (AssemblyRef)reader.GetAssemblyReference(r).GetAssemblyName());
+        var bepinex = references.Where(static r => r.Name?.StartsWith("BepInEx") ?? false);
         var result = new AssemblyAnalysis(
-           Assembly: definition.GetAssemblyName(),
+            Assembly: definition.GetAssemblyName(),
 
-           BepInExAssemblies: bepinex,
+            BepInExAssemblies: bepinex,
 
-           BepInExPatcherTypes: bepinex switch
-           {
-               _ when bepinex.Any(static a => a.Version?.Major == 6) => GetBie6PatcherTypes(reader),
+            BepInExPatcherTypes: bepinex switch
+            {
+                _ when bepinex.Any(static a => a.Version?.Major == 6) => reader.TypeDefinitions
+                    .Select(reader.GetTypeDefinition)
+                    .Where(type => type.GetCustomAttributes()
+                        .Any(attr => GetFullName(reader.GetCustomAttribute(attr), reader) is string name
+                            && name.StartsWith("BepInEx.") && name.EndsWith(".PatcherPluginInfoAttribute")))
+                    .Select(type => new TypeRef(type, reader)),
 
-               _ when bepinex.Any(static a => a.Name == "BepInEx" && a.Version?.Major == 5) => GetBie5PatcherTypes(reader),
+                _ when bepinex.Any(static a => a.Name == "BepInEx" && a.Version?.Major == 5) => reader.TypeDefinitions
+                    .Select(reader.GetTypeDefinition)
+                    .Where(type => type.GetProperties()
+                        .Any(prop => reader.GetString(reader.GetPropertyDefinition(prop).Name) == "TargetDLLs")
+                            && type.GetMethods()
+                                .Any(method => reader.GetString(reader.GetMethodDefinition(method).Name) == "Patch"))
+                    .Select(type => new TypeRef(type, reader)),
 
-               _ => [],
-           },
+                _ => [],
+            },
 
-           BepInExPluginTypes: bepinex.Any(static a => a.Version?.Major == 5 || a.Version?.Major == 6) switch
-           {
-               true => GetBiePluginTypes(reader),
-
-               false => [],
-           });
+            BepInExPluginTypes: bepinex.Any(static a => a.Version?.Major == 5 || a.Version?.Major == 6)
+                ? reader.TypeDefinitions
+                    .Select(reader.GetTypeDefinition)
+                    .Where(type => type.GetCustomAttributes()
+                        .Any(attr => GetFullName(reader.GetCustomAttribute(attr), reader)?.StartsWith("BepInEx.BepInPlugin") ?? false))
+                    .Select(type => new TypeRef(type, reader))
+                : []
+        );
 
         return JsonSerializer.Serialize(result);
     }
