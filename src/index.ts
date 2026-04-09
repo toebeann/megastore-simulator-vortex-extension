@@ -14,10 +14,15 @@ import logo from "../assets/gameart.jpg";
 
 import { version } from "../package.json";
 
+import { register as registerInstallerAdditionalProductsPack } from "./installers/additional-products";
 import { register as registerInstallerBepInEx } from "./installers/bepinex";
 import { register as registerInstallerBepInEx5Plugin } from "./installers/bepinex-5-plugin";
 import { register as registerInstallerBepInExConfigFile } from "./installers/bepinex-config-file";
 import { register as registerInstallerSaveFile } from "./installers/save-file";
+import {
+  ADDITIONAL_PRODUCTS_PACK_DIR,
+  register as registerModTypeAdditionalProductsPack,
+} from "./modTypes/additional-products";
 import { register as registerModTypeBepInEx } from "./modTypes/bepinex-5";
 import { register as registerModTypeBepInEx5Plugin } from "./modTypes/bepinex-5-plugin";
 import { register as registerModTypeBepInExConfigFile } from "./modTypes/bepinex-config-file";
@@ -77,8 +82,11 @@ export default function main(_context: t.IExtensionContext): boolean {
     setup: async (discovery) => {
       if (discovery?.path) {
         const { path } = discovery;
-        await Promise.all([BEPINEX_MOD_PATH, BEPINEX_CONFIG_DIR_PATH]
-          .map((dir) => ensureDirWritableAsync(resolve(path, dir))));
+        await Promise.all([
+          BEPINEX_MOD_PATH,
+          BEPINEX_CONFIG_DIR_PATH,
+          ADDITIONAL_PRODUCTS_PACK_DIR,
+        ].map((dir) => ensureDirWritableAsync(resolve(path, dir))));
       }
 
       await handleChangelog();
@@ -163,11 +171,13 @@ export default function main(_context: t.IExtensionContext): boolean {
   registerModTypeBepInEx5Plugin();
   registerModTypeSaveFile();
   registerModTypeBepInExConfigFile();
+  registerModTypeAdditionalProductsPack();
 
   registerInstallerBepInEx();
   registerInstallerBepInEx5Plugin();
   registerInstallerSaveFile();
   registerInstallerBepInExConfigFile();
+  registerInstallerAdditionalProductsPack();
 
   // TODO: register an installer & mod type for bepinex patchers
   // TODO: register a fallback installer & mod type at prio 99 to handle archives that are rooted to the game folder
