@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0] - 2026-04-09
+
+### Added
+
+- Implement installer to handle product packs for [Additional Products](https://www.nexusmods.com/megastoresimulator/mods/34) ([`7a5f2b7`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/7a5f2b7))
+    - Intelligently calculates appropriate installation location based on `manifest.xml` and archive folder structure
+
 ## [1.1.1] - 2026-04-05
 
 ### Changed
@@ -32,3 +39,4 @@ _Initial release 🚀_
 [1.0.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.0.0
 [1.1.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.1.0
 [1.1.1]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.1.1
+[1.2.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.2.0
