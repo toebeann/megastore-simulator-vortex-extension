@@ -8,6 +8,7 @@ import type { types as t } from "vortex-api";
 import { NEXUS_GAME_ID } from "../constants";
 import { validSaveFiles } from "../installers/save-file";
 import { getSaveFolder } from "../util/getSaveFolder";
+import { context } from "..";
 
 export const SAVE_FILE_MOD_TYPE = "save-file";
 
@@ -24,8 +25,8 @@ export const test = async (
   return saveFiles.length >= 1 && saveFiles.length <= 4;
 };
 
-export const register = (context: t.IExtensionContext) =>
-  context.registerModType(
+export const register = () =>
+  context?.registerModType(
     SAVE_FILE_MOD_TYPE,
     80,
     isSupported,
@@ -33,4 +34,3 @@ export const register = (context: t.IExtensionContext) =>
     test,
     { name: "Save File", mergeMods: true },
   );
-export default register;

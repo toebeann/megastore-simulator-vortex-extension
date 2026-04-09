@@ -15,6 +15,8 @@ import { some } from "../util/async";
 import { BEPINEX_CORE_FILES } from "../util/bepinex";
 import { getSaveFolder } from "../util/getSaveFolder";
 import { exec } from "../util/powershell";
+import { getState } from "../util/vortex";
+import { context } from "..";
 
 import statAsync = fs.statAsync;
 import installPath = selectors.installPath;
@@ -34,12 +36,11 @@ export type ValidSaveFile = typeof validSaveFiles[number];
 export const deletedSlotHash =
   "2E59EE266815625D19A361AE2ACC75720EE239B61FD892F92D1451DC3A977EB8" as const;
 
-export const testSupported = async (
-  api: t.IExtensionApi,
-  files: string[],
-  gameId: string,
-  archivePath?: string,
-): Promise<t.ISupportedResult> => {
+export const testSupported: t.TestSupported = async (
+  files,
+  gameId,
+  archivePath,
+) => {
   const result: t.ISupportedResult = { requiredFiles: [], supported: false };
   if (gameId !== NEXUS_GAME_ID) return result; // wrong game
 
@@ -64,7 +65,7 @@ export const testSupported = async (
     // get vortex working path of mod being installed
     const id = archivePath && parse(archivePath).name;
     const workingPath = id && resolve(
-      installPath(api.getState()) ||
+      installPath(getState()) ||
         resolve(getVortexPath("userData"), gameId, "mods"),
       `${id}.installing`,
     );
@@ -89,7 +90,7 @@ export const testSupported = async (
   }
 };
 
-export const install = async (api: t.IExtensionApi, files: string[]) => {
+export const install: t.InstallFunc = async (files) => {
   interface SaveFileMapping {
     slot: ValidSaveFile;
     size: number;
@@ -154,26 +155,24 @@ export const install = async (api: t.IExtensionApi, files: string[]) => {
   // TODO: provide some info that steam might complain about local saves not matching what's in the cloud
   // user should choose local files over cloud if prompted
 
-  const instructions = rooted.map((source): t.IInstruction => ({
-    type: "copy",
-    source,
-    destination: saveFiles.includes(source)
-      ? saveSlotMap.values().find((slot) => slot.source === source)!.slot
-      : join(
-        dirname(source).split(sep).slice(rootIndex).join(sep),
-        basename(source),
-      ),
-  }));
-
-  return { instructions } satisfies t.IInstallResult;
+  return {
+    instructions: rooted.map((source) => ({
+      type: "copy",
+      source,
+      destination: saveFiles.includes(source)
+        ? saveSlotMap.values().find((slot) => slot.source === source)!.slot
+        : join(
+          dirname(source).split(sep).slice(rootIndex).join(sep),
+          basename(source),
+        ),
+    })),
+  };
 };
 
-export const register = (context: t.IExtensionContext) =>
-  context.registerInstaller(
+export const register = () =>
+  context?.registerInstaller(
     SAVE_FILE_MOD_TYPE,
     30,
-    (files, gameId, archivePath) =>
-      testSupported(context.api, files, gameId, archivePath),
-    (files) => install(context.api, files),
+    testSupported,
+    install,
   );
-export default register;

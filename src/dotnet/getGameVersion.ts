@@ -6,36 +6,35 @@
 import { resolve } from "node:path";
 
 import { quote } from "shell-quote";
-import type { types as t } from "vortex-api";
+import { boolean, int, looseObject, optional, string } from "zod/mini";
 
 // @ts-expect-error
 import script from "../../assets/applicationVersion.fsx" with { type: "file" };
 // @ts-expect-error
 import tpk from "../../assets/lz4.tpk" with { type: "file" };
+import type { Utils } from "../../DotNetUtils/bin/Release/DotNetUtils";
+// @ts-expect-error
+import dotnetUtils from "../../DotNetUtils/bin/Release/DotNetUtils.dll" with {
+  type: "file",
+};
+// @ts-expect-error
+import "../../DotNetUtils/bin/Release/AssetsTools.NET.dll" with { type: "file" };
 
 import { GAME_EXE } from "../constants";
-import {
-  fileVersionInfoCodec,
-  fileVersionInfoSchema,
-  getApplicationVersion as _getApplicationVersion,
-  initialize,
-} from "../dotnet";
 import { exec } from "../util/powershell";
 import { resolveExtensionPath } from "../util/resolveExtensionPath";
-import { nonEmptyStringSchema } from "../util/zod";
+import { jsonCodec, nonEmptyStringSchema } from "../util/zod";
+import { dotnet } from ".";
 
-export const getApplicationVersion = (
-  gameDataPath: string,
-  api: t.IExtensionApi,
-) => {
+export const getApplicationVersion = (gameDataPath: string) => {
   try {
-    if (_getApplicationVersion) {
-      const result = _getApplicationVersion(
-        gameDataPath,
-        resolveExtensionPath(tpk, api),
-      );
-      if (result) return result.trim();
-    }
+    const utils: typeof Utils = dotnet()!
+      .require(resolveExtensionPath(dotnetUtils)).Utils;
+    const result = utils.getApplicationVersion(
+      gameDataPath,
+      resolveExtensionPath(tpk),
+    )?.trim();
+    if (result) return result;
   } catch (error) {
     console.error(error);
   }
@@ -48,9 +47,9 @@ export const getApplicationVersion = (
     const command = quote([
       "dotnet",
       "fsi",
-      resolveExtensionPath(script, api),
+      resolveExtensionPath(script),
       gameDataPath,
-      resolveExtensionPath(tpk, api),
+      resolveExtensionPath(tpk),
     ]);
     return exec(command).trim();
   } catch (error) {
@@ -58,18 +57,48 @@ export const getApplicationVersion = (
   }
 };
 
-export const getFileVersionInfo = (path: string, api?: t.IExtensionApi) => {
-  if (api) {
-    try {
-      const dotnet = initialize(api);
-      dotnet.load("System.Diagnostics.FileVersionInfo");
-      return fileVersionInfoSchema.parse(
-        // @ts-expect-error
-        dotnet.System.Diagnostics.FileVersionInfo.GetVersionInfo(path),
-      );
-    } catch (error) {
-      console.error(error);
-    }
+const fileVersionInfoSchema = looseObject({
+  Comments: optional(string()),
+  CompanyName: optional(string()),
+  FileBuildPart: int(),
+  FileDescription: optional(string()),
+  FileMajorPart: int(),
+  FileMinorPart: int(),
+  FileName: string(),
+  FilePrivatePart: int(),
+  FileVersion: optional(string()),
+  InternalName: optional(string()),
+  IsDebug: boolean(),
+  IsPatched: boolean(),
+  IsPrivateBuild: boolean(),
+  IsPreRelease: boolean(),
+  IsSpecialBuild: boolean(),
+  Language: optional(string()),
+  LegalCopyright: optional(string()),
+  LegalTrademarks: optional(string()),
+  OriginalFilename: optional(string()),
+  PrivateBuild: optional(string()),
+  ProductBuildPart: int(),
+  ProductMajorPart: int(),
+  ProductMinorPart: int(),
+  ProductName: optional(string()),
+  ProductPrivatePart: int(),
+  ProductVersion: optional(string()),
+  SpecialBuild: optional(string()),
+});
+
+const fileVersionInfoCodec = jsonCodec(fileVersionInfoSchema);
+
+export const getFileVersionInfo = (path: string) => {
+  try {
+    // @ts-expect-error
+    const { load, System } = dotnet()!;
+    load("System.Diagnostics.FileVersionInfo");
+    return fileVersionInfoSchema.parse(
+      System.Diagnostics.FileVersionInfo.GetVersionInfo(path),
+    );
+  } catch (error) {
+    console.error(error);
   }
 
   // fallback: powershell -c `(Get-Item $(path)).VersionInfo | ConvertTo-Json -Compress`
@@ -84,13 +113,11 @@ export const getFileVersionInfo = (path: string, api?: t.IExtensionApi) => {
   }
 };
 
-export const getGameVersion = (gamePath: string, api?: t.IExtensionApi) => {
-  if (api) {
-    const { data: applicationVersion } = nonEmptyStringSchema.safeParse(
-      getApplicationVersion(resolve(gamePath, "Megastore Simulator_Data"), api),
-    );
-    if (applicationVersion) return applicationVersion;
-  }
+export const getGameVersion = (gamePath: string) => {
+  const { data: applicationVersion } = nonEmptyStringSchema.safeParse(
+    getApplicationVersion(resolve(gamePath, "Megastore Simulator_Data")),
+  );
+  if (applicationVersion) return applicationVersion;
 
   for (const path of [GAME_EXE, "UnityPlayer.dll"]) {
     const info = getFileVersionInfo(resolve(gamePath, path));

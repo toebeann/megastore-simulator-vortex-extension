@@ -14,14 +14,15 @@ import {
   BEPINEX_DIR,
 } from "../util/bepinex";
 import { getDiscovery } from "../util/vortex";
+import { context } from "..";
 
 export const BEPINEX_5_MOD_TYPE = "bepinex-5";
 
 export const isSupported = (gameId: string): boolean =>
   gameId === NEXUS_GAME_ID;
 
-export const getPath = (state: t.IState, game: t.IGame): string =>
-  getDiscovery(state, game.id)?.path ?? "";
+export const getPath = (game: t.IGame): string =>
+  getDiscovery(undefined, game.id)?.path ?? "";
 
 export const test = async (
   instructions: t.IInstruction[],
@@ -41,13 +42,12 @@ export const test = async (
     );
 };
 
-export const register = (context: t.IExtensionContext) =>
-  context.registerModType(
+export const register = () =>
+  context?.registerModType(
     BEPINEX_5_MOD_TYPE,
     50,
     isSupported,
-    (game: t.IGame) => getPath(context.api.getState(), game),
+    getPath,
     test,
     { name: "BepInEx 5", mergeMods: true, deploymentEssential: true },
   );
-export default register;

@@ -3,13 +3,12 @@
  * Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
  * with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import type { types as t } from "vortex-api";
-
 import { load } from "cheerio";
 import { gte, lt, major, valid } from "semver";
 import store2 from "store2";
 import * as z from "zod/mini";
 
+import { context } from "..";
 import { EXTENSION_ID } from "../constants";
 import { getHtml } from "./macro" with { type: "macro" };
 
@@ -116,12 +115,12 @@ export const transform = (config?: Partial<TransformConfig>) => {
 };
 
 export const show = async (
-  api: t.IExtensionApi,
   htmlText: string,
   latest: Version,
   title = "Megastore Simulator Vortex Extension has been updated",
-) =>
-  api.showDialog?.(
+) => {
+  const { api: { dismissNotification, showDialog } } = context!;
+  showDialog?.(
     "info",
     title,
     { htmlText },
@@ -129,30 +128,35 @@ export const show = async (
       label: "I understand",
       action: () => {
         store(LAST_SEEN, latest);
-        api.dismissNotification?.("extension-updated");
+        dismissNotification?.("extension-updated");
       },
     }],
   );
+};
 
-export const handle = async (api: t.IExtensionApi) => {
+export const handle = async () => {
+  if (!context) return;
+
   const { hasUpdate, latest, output, input, hasImportantUpdate } = transform();
 
   if (hasUpdate) {
     store(LAST_USED, latest);
 
-    api.sendNotification?.({
+    const { api: { sendNotification } } = context;
+
+    sendNotification?.({
       id: "extension-updated",
       type: "success",
       title: "Extension updated",
       message: "Megastore Simulator Vortex Extension updated",
       actions: [{
         title: "Changelog",
-        action: () => show(api, output ?? input, latest),
+        action: () => show(output ?? input, latest),
       }],
     });
   }
 
-  if (hasImportantUpdate) await show(api, output ?? input, latest);
+  if (hasImportantUpdate) await show(output ?? input, latest);
 };
 
 export const migrate = (version: string) => {

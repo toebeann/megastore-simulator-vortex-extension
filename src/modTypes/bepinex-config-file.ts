@@ -14,6 +14,7 @@ import {
   BEPINEX_DIR,
 } from "../util/bepinex";
 import { getDiscovery } from "../util/vortex";
+import { context } from "..";
 
 import isChildPath = util.isChildPath;
 
@@ -21,8 +22,11 @@ export const BEPINEX_CONFIG_FILE_MOD_TYPE = "bepinex-config-file";
 
 export const isSupported = (gameId: string) => gameId === NEXUS_GAME_ID;
 
-export const getPath = (state: t.IState, game: t.IGame): string =>
-  resolve(getDiscovery(state, game.id)?.path ?? "", BEPINEX_CONFIG_DIR_PATH);
+export const getPath = (game: t.IGame): string =>
+  resolve(
+    getDiscovery(undefined, game.id)?.path ?? "",
+    BEPINEX_CONFIG_DIR_PATH,
+  );
 
 export const test = async (
   instructions: t.IInstruction[],
@@ -47,13 +51,12 @@ export const test = async (
       );
 };
 
-export const register = (context: t.IExtensionContext) =>
-  context.registerModType(
+export const register = () =>
+  context?.registerModType(
     BEPINEX_CONFIG_FILE_MOD_TYPE,
     90,
     isSupported,
-    (game: t.IGame) => getPath(context.api.getState(), game),
+    getPath,
     test,
     { name: "BepInEx Config File", mergeMods: true },
   );
-export default register;

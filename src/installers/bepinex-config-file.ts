@@ -20,17 +20,18 @@ import { NEXUS_GAME_ID } from "../constants";
 import { BEPINEX_CONFIG_FILE_MOD_TYPE } from "../modTypes/bepinex-config-file";
 import { some } from "../util/async";
 import { BEPINEX_CONFIG_DIR, BEPINEX_CORE_FILES } from "../util/bepinex";
+import { getState } from "../util/vortex";
+import { context } from "..";
 
 import installPath = selectors.installPath;
 import getVortexPath = util.getVortexPath;
 import isChildPath = util.isChildPath;
 
-export const testSupported = async (
-  api: t.IExtensionApi,
-  files: string[],
-  gameId: string,
-  archivePath?: string,
-): Promise<t.ISupportedResult> => {
+export const testSupported: t.TestSupported = async (
+  files,
+  gameId,
+  archivePath,
+) => {
   const result: t.ISupportedResult = { requiredFiles: [], supported: false };
   if (gameId !== NEXUS_GAME_ID) return result; // wrong game
 
@@ -55,7 +56,7 @@ export const testSupported = async (
     // get vortex working path of mod being installed
     const id = archivePath && parse(archivePath).name;
     const workingPath = id && resolve(
-      installPath(api.getState()) ||
+      installPath(getState()) ||
         resolve(getVortexPath("userData"), gameId, "mods"),
       `${id}.installing`,
     );
@@ -84,7 +85,7 @@ export const testSupported = async (
   }
 };
 
-export const install = async (files: string[]) => {
+export const install: t.InstallFunc = async (files) => {
   const sansDirectories = files.filter((file) => !file.endsWith(sep));
 
   const configFile = sansDirectories
@@ -98,24 +99,22 @@ export const install = async (files: string[]) => {
   const rooted = sansDirectories
     .filter((file) => dirname(file) === rootDir || isChildPath(file, rootDir));
 
-  const instructions = rooted.map((source): t.IInstruction => ({
-    type: "copy",
-    source,
-    destination: join(
-      dirname(source).split(sep).slice(rootIndex + 1).join(sep),
-      basename(source),
-    ),
-  }));
-
-  return { instructions } satisfies t.IInstallResult;
+  return {
+    instructions: rooted.map((source) => ({
+      type: "copy",
+      source,
+      destination: join(
+        dirname(source).split(sep).slice(rootIndex + 1).join(sep),
+        basename(source),
+      ),
+    })),
+  };
 };
 
-export const register = (context: t.IExtensionContext) =>
-  context.registerInstaller(
+export const register = () =>
+  context?.registerInstaller(
     BEPINEX_CONFIG_FILE_MOD_TYPE,
     35,
-    (files, gameId, archivePath) =>
-      testSupported(context.api, files, gameId, archivePath),
+    testSupported,
     install,
   );
-export default register;

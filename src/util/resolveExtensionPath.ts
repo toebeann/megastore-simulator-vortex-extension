@@ -5,7 +5,7 @@
  */
 import { resolve } from "node:path";
 
-import type { types as t } from "vortex-api";
+import { context } from "..";
 
-export const resolveExtensionPath = (path: string, api: t.IExtensionApi) =>
-  resolve(api.extension?.path ?? "", path);
+export const resolveExtensionPath = (path: string) =>
+  resolve(context?.api.extension?.path ?? "", path);

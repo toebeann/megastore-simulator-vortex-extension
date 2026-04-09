@@ -28,7 +28,7 @@ const { values: config } = parseArgs({
 });
 
 await build({
-  entrypoints: ["src/index.ts"],
+  entrypoints: ["src/index"],
   outdir: "dist",
   external: Object.values(externals()),
   target: "node",

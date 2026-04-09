@@ -6,18 +6,18 @@
 import { access } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
-import { type types as t } from "vortex-api";
-
 import { BEPINEX_5_MOD_TYPE } from "../modTypes/bepinex-5";
 
 import {
   getDisabledMods,
   getDiscovery,
   getEnabledMods,
+  getState,
   installMod,
   setModsEnabled,
   TRANSLATION_OPTIONS,
 } from "./vortex";
+import { context } from "..";
 
 export const BEPINEX_NEXUS_ID = 2;
 
@@ -43,11 +43,11 @@ export const BEPINEX_CORE_FILES = [
   "MonoMod.Utils.dll",
 ] as const;
 
-export const isBepInExEnabled = (state: t.IState) =>
+export const isBepInExEnabled = (state = getState()) =>
   getEnabledMods(state).some(({ type }) => type === BEPINEX_5_MOD_TYPE);
 
 export const isBepInExCoreInstalled = async (
-  state: t.IState,
+  state = getState(),
   discovery = getDiscovery(state),
 ) => {
   if (!discovery?.path) return false;
@@ -65,8 +65,8 @@ export const isBepInExCoreInstalled = async (
   }
 };
 
-export const validateBepInEx = async (api: t.IExtensionApi) => {
-  const state = api.getState();
+export const validateBepInEx = async () => {
+  const state = getState()!;
   if (
     !isBepInExEnabled(state) &&
     !(await isBepInExCoreInstalled(state))
@@ -75,30 +75,33 @@ export const validateBepInEx = async (api: t.IExtensionApi) => {
       .filter(({ type }) => type === BEPINEX_5_MOD_TYPE);
     const disabledBepInEx = potentials.length === 1 ? potentials[0] : undefined;
 
-    api.sendNotification?.({
+    const { api: { sendNotification, translate } } = context!;
+
+    sendNotification?.({
       id: "bepinex-missing",
       type: "warning",
-      title: api.translate(
+      title: translate(
         `{{bepinex}} is ${disabledBepInEx ? "disabled" : "not installed"}`,
         TRANSLATION_OPTIONS,
       ),
-      message: api.translate(
+      message: translate(
         "{{bepinex}} is required to mod {{game}}",
         TRANSLATION_OPTIONS,
       ),
       actions: [
         disabledBepInEx
           ? {
-            title: api.translate("Enable"),
-            action: () => setModsEnabled(api, true, disabledBepInEx.id),
+            title: translate("Enable"),
+            action: () => setModsEnabled(true, disabledBepInEx.id),
           }
           : {
-            title: api.translate("Install", TRANSLATION_OPTIONS),
-            action: () => installMod(api, 2),
+            title: translate("Install", TRANSLATION_OPTIONS),
+            action: () => installMod(2),
           },
       ],
     });
   } else {
-    api.dismissNotification?.("bepinex-missing");
+    const { api: { dismissNotification } } = context!;
+    dismissNotification?.("bepinex-missing");
   }
 };

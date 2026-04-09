@@ -13,6 +13,7 @@ import {
   BEPINEX_CORE_FILES,
   BEPINEX_DIR,
 } from "../util/bepinex";
+import { context } from "..";
 
 export const testSupported: t.TestSupported = async (files, gameId) => {
   const result: t.ISupportedResult = { requiredFiles: [], supported: false };
@@ -36,27 +37,25 @@ export const testSupported: t.TestSupported = async (files, gameId) => {
   }
 };
 
-export const install = async (api: t.IExtensionApi, files: string[]) => {
-  api.dismissNotification?.("bepinex-missing");
-
+export const install: t.InstallFunc = async (files) => {
+  context?.api.dismissNotification?.("bepinex-missing");
   return {
     instructions: [
       ...files
         .filter((file) => !file.endsWith(sep))
-        .map((source) => ({
+        .map((source): t.IInstruction => ({
           type: "copy",
           source,
           destination: source,
-        } satisfies t.IInstruction)),
+        })),
     ],
-  } satisfies t.IInstallResult;
+  };
 };
 
-export const register = (context: t.IExtensionContext) =>
-  context.registerInstaller(
+export const register = () =>
+  context?.registerInstaller(
     "bepinex",
     50,
     testSupported,
-    (files) => install(context.api, files),
+    install,
   );
-export default register;

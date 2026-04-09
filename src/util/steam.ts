@@ -14,10 +14,8 @@ import { nonEmptyStringSchema } from "./zod";
 
 import readFileAsync = fs.readFileAsync;
 
-export const getManifestPath = (
-  state: t.IState,
-  discovery = getDiscovery(state),
-) => {
+export const getManifestPath = () => {
+  const discovery = getDiscovery();
   if (discovery?.path && discovery?.store === "steam") {
     return resolve(
       discovery.path,
@@ -28,11 +26,8 @@ export const getManifestPath = (
   }
 };
 
-export const getManifest = async (
-  state: t.IState,
-  discovery = getDiscovery(state),
-) => {
-  const path = getManifestPath(state, discovery);
+export const getManifest = async () => {
+  const path = getManifestPath();
   if (path) {
     const data = await readFileAsync(path, { encoding: "utf8" });
     const { data: text } = nonEmptyStringSchema.safeParse(data);
@@ -40,14 +35,12 @@ export const getManifest = async (
   }
 };
 
-export const getBranch = async (
-  state: t.IState,
-  discovery = getDiscovery(state),
-) => {
+export const getBranch = async () => {
+  const discovery = getDiscovery();
   if (discovery?.store !== "steam" || !discovery.path) return "public"; // assume public branch
 
   try {
-    const manifest = await getManifest(state, discovery);
+    const manifest = await getManifest();
     if (manifest) {
       const { AppState: { UserConfig, MountedConfig } } = manifest;
       const { data: branch } = nonEmptyStringSchema.safeParse(

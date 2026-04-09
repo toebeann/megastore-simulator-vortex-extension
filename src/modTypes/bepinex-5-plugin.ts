@@ -14,6 +14,7 @@ import {
   BEPINEX_MOD_PATH,
 } from "../util/bepinex";
 import { getDiscovery } from "../util/vortex";
+import { context } from "..";
 
 import isChildPath = util.isChildPath;
 
@@ -22,8 +23,8 @@ export const BEPINEX_5_PLUGIN_MOD_TYPE = "bepinex-5-plugin";
 export const isSupported = (gameId: string): boolean =>
   gameId === NEXUS_GAME_ID;
 
-export const getPath = (state: t.IState, game: t.IGame): string =>
-  resolve(getDiscovery(state, game.id)?.path ?? "", BEPINEX_MOD_PATH);
+export const getPath = (game: t.IGame): string =>
+  resolve(getDiscovery(undefined, game.id)?.path ?? "", BEPINEX_MOD_PATH);
 
 export const test = async (
   instructions: t.IInstruction[],
@@ -48,13 +49,12 @@ export const test = async (
       );
 };
 
-export const register = (context: t.IExtensionContext) =>
-  context.registerModType(
+export const register = () =>
+  context?.registerModType(
     BEPINEX_5_PLUGIN_MOD_TYPE,
     80,
     isSupported,
-    (game: t.IGame) => getPath(context.api.getState(), game),
+    getPath,
     test,
     { name: "BepInEx 5 Plugin", mergeMods: true },
   );
-export default register;

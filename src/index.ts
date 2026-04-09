@@ -14,16 +14,16 @@ import logo from "../assets/gameart.jpg";
 
 import { version } from "../package.json";
 
-import registerInstallerBepInEx from "./installers/bepinex";
-import registerInstallerBepInEx5Plugin from "./installers/bepinex-5-plugin";
-import registerInstallerBepInExConfigFile from "./installers/bepinex-config-file";
-import registerInstallerSaveFile from "./installers/save-file";
-import registerModTypeBepInEx from "./modTypes/bepinex-5";
-import registerModTypeBepInEx5Plugin from "./modTypes/bepinex-5-plugin";
-import registerModTypeBepInExConfigFile from "./modTypes/bepinex-config-file";
-import registerModTypeSaveFile from "./modTypes/save-file";
+import { register as registerInstallerBepInEx } from "./installers/bepinex";
+import { register as registerInstallerBepInEx5Plugin } from "./installers/bepinex-5-plugin";
+import { register as registerInstallerBepInExConfigFile } from "./installers/bepinex-config-file";
+import { register as registerInstallerSaveFile } from "./installers/save-file";
+import { register as registerModTypeBepInEx } from "./modTypes/bepinex-5";
+import { register as registerModTypeBepInEx5Plugin } from "./modTypes/bepinex-5-plugin";
+import { register as registerModTypeBepInExConfigFile } from "./modTypes/bepinex-config-file";
+import { register as registerModTypeSaveFile } from "./modTypes/save-file";
 
-import { initialize, setup as dotnetSetup } from "./dotnet";
+import { dotnet } from "./dotnet";
 import { getGameVersion } from "./dotnet/getGameVersion";
 import {
   BEPINEX_CONFIG_DIR_PATH,
@@ -33,7 +33,7 @@ import {
 } from "./util/bepinex";
 import { getSaveFolder } from "./util/getSaveFolder";
 import { resolveExtensionPath } from "./util/resolveExtensionPath";
-import { getAllMods, getDiscovery } from "./util/vortex";
+import { getAllMods, getDiscovery, getState } from "./util/vortex";
 
 import {
   handle as handleChangelog,
@@ -46,10 +46,13 @@ import { GAME_EXE, GAME_NAME, NEXUS_GAME_ID, STEAM_GAME_ID } from "./constants";
 
 import ensureDirWritableAsync = fs.ensureDirWritableAsync;
 import currentGame = selectors.currentGame;
-import discoveryByGame = selectors.discoveryByGame;
 import profileById = selectors.profileById;
 
-export default function main(context: t.IExtensionContext): boolean {
+export let context: t.IExtensionContext | undefined = undefined;
+
+export default function main(_context: t.IExtensionContext): boolean {
+  context = _context;
+
   context.registerMigration(migrate);
 
   context.registerGame({
@@ -67,24 +70,19 @@ export default function main(context: t.IExtensionContext): boolean {
       store === "steam"
         ? { launcher: "steam", addInfo: STEAM_GAME_ID }
         : undefined,
-    getGameVersion: (gamePath) =>
-      Promise.resolve(getGameVersion(gamePath, context.api)),
+    getGameVersion: (gamePath) => Promise.resolve(getGameVersion(gamePath)),
     contributed: "toebeann",
     defaultPrimary: true,
     version,
     setup: async (discovery) => {
-      const { api } = context;
-
-      dotnetSetup(api);
-
       if (discovery?.path) {
         const { path } = discovery;
         await Promise.all([BEPINEX_MOD_PATH, BEPINEX_CONFIG_DIR_PATH]
           .map((dir) => ensureDirWritableAsync(resolve(path, dir))));
       }
 
-      await handleChangelog(api);
-      await validateBepInEx(api);
+      await handleChangelog();
+      await validateBepInEx();
     },
   });
 
@@ -95,7 +93,7 @@ export default function main(context: t.IExtensionContext): boolean {
     {},
     "Open Save Folder",
     () => util.opn(getSaveFolder()),
-    () => currentGame(context.api.getState())?.id === NEXUS_GAME_ID,
+    () => currentGame(getState())?.id === NEXUS_GAME_ID,
   );
 
   context.registerAction(
@@ -105,9 +103,11 @@ export default function main(context: t.IExtensionContext): boolean {
     {},
     "Open BepInEx Folder",
     () =>
-      util.opn(resolve(getDiscovery(context.api.getState())!.path!, "BepInEx")),
+      util.opn(
+        resolve(getDiscovery()!.path!, "BepInEx"),
+      ),
     () => {
-      const state = context.api.getState();
+      const state = getState();
       const discovery = getDiscovery(state);
       const currentGameId = currentGame(state)?.id;
       return currentGameId === NEXUS_GAME_ID && Boolean(discovery?.path);
@@ -120,16 +120,9 @@ export default function main(context: t.IExtensionContext): boolean {
     "open-ext",
     {},
     "Open BepInEx Config Folder",
-    () =>
-      util.opn(
-        resolve(
-          getDiscovery(context.api.getState())!.path!,
-          "BepInEx",
-          "config",
-        ),
-      ),
+    () => util.opn(resolve(getDiscovery()!.path!, "BepInEx", "config")),
     () => {
-      const state = context.api.getState();
+      const state = getState();
       const discovery = getDiscovery(state);
       const currentGameId = currentGame(state)?.id;
       return currentGameId === NEXUS_GAME_ID && Boolean(discovery?.path);
@@ -143,14 +136,9 @@ export default function main(context: t.IExtensionContext): boolean {
     {},
     "Open BepInEx Log File",
     () =>
-      util.opn(
-        resolve(
-          getDiscovery(context.api.getState())!.path!,
-          BEPINEX_LOG_FILE_PATH,
-        ),
-      ),
+      util.opn(resolve(getDiscovery(getState())!.path!, BEPINEX_LOG_FILE_PATH)),
     () => {
-      const state = context.api.getState();
+      const state = getState();
       const currentGameId = currentGame(state)?.id;
       if (currentGameId !== NEXUS_GAME_ID) return false;
       const discovery = getDiscovery(state);
@@ -166,45 +154,30 @@ export default function main(context: t.IExtensionContext): boolean {
     "Changelog",
     () => {
       const { output, input, latest } = transform();
-      show(
-        context.api,
-        output ?? input,
-        latest,
-        "Megastore Simulator Vortex Extension",
-      );
+      show(output ?? input, latest, "Megastore Simulator Vortex Extension");
     },
-    () => {
-      const state = context.api.getState();
-      const currentGameId = currentGame(state)?.id;
-      return currentGameId === NEXUS_GAME_ID;
-    },
+    () => currentGame(getState())?.id === NEXUS_GAME_ID,
   );
 
-  registerModTypeBepInEx(context);
-  registerModTypeBepInEx5Plugin(context);
-  registerModTypeSaveFile(context);
-  registerModTypeBepInExConfigFile(context);
+  registerModTypeBepInEx();
+  registerModTypeBepInEx5Plugin();
+  registerModTypeSaveFile();
+  registerModTypeBepInExConfigFile();
 
-  registerInstallerBepInEx(context);
-  registerInstallerBepInEx5Plugin(context);
-  registerInstallerSaveFile(context);
-  registerInstallerBepInExConfigFile(context);
+  registerInstallerBepInEx();
+  registerInstallerBepInEx5Plugin();
+  registerInstallerSaveFile();
+  registerInstallerBepInExConfigFile();
 
   // TODO: register an installer & mod type for bepinex patchers
   // TODO: register a fallback installer & mod type at prio 99 to handle archives that are rooted to the game folder
 
   context.once(() => {
     if (feature("DEVTOOLS")) {
-      dotnetSetup(context.api);
-
-      const getState = () => context.api.getState();
-      const getDiscovery = (state = getState()) =>
-        discoveryByGame(state, NEXUS_GAME_ID);
-
       Object.assign(globalThis, {
         [NEXUS_GAME_ID]: {
           context,
-          extension: context.api.extension,
+          extension: context?.api.extension,
           changelog: {
             transform,
             show: (async (
@@ -212,13 +185,12 @@ export default function main(context: t.IExtensionContext): boolean {
               title?: string,
             ) => {
               const { output, input, latest } = transform(config);
-              return await show(context.api, output ?? input, latest, title);
+              return await show(output ?? input, latest, title);
             }),
           },
-          dotnet: initialize(context.api),
-          resolve: (path: string) => resolveExtensionPath(path, context.api),
-          getAllMods: (gameId = NEXUS_GAME_ID) =>
-            getAllMods(getState(), gameId),
+          dotnet,
+          resolve: (path: string) => resolveExtensionPath(path),
+          getAllMods,
           getDiscovery,
           getState,
           stores: { changelog: changelogStore },
@@ -227,12 +199,12 @@ export default function main(context: t.IExtensionContext): boolean {
       });
     }
 
-    context.api.onAsync("did-deploy", async (profileId: string) => {
+    context?.api.onAsync("did-deploy", async (profileId: string) => {
       if (
-        profileById(context.api.getState(), profileId)?.gameId !== NEXUS_GAME_ID
+        profileById(getState()!, profileId)?.gameId !== NEXUS_GAME_ID
       ) return;
 
-      await validateBepInEx(context.api);
+      await validateBepInEx();
     });
   });
 

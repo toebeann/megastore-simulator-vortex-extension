@@ -22,17 +22,18 @@ import { getAssemblyAnalysis } from "../dotnet/getAssemblyAnalysis";
 import { BEPINEX_5_PLUGIN_MOD_TYPE } from "../modTypes/bepinex-5-plugin";
 import { some } from "../util/async";
 import { BEPINEX_CORE_FILES, BEPINEX_PLUGINS_DIR } from "../util/bepinex";
+import { getState } from "../util/vortex";
+import { context } from "..";
 
 import installPath = selectors.installPath;
 import getVortexPath = util.getVortexPath;
 import isChildPath = util.isChildPath;
 
-export const testSupported = async (
-  api: t.IExtensionApi,
-  files: string[],
-  gameId: string,
-  archivePath?: string,
-): Promise<t.ISupportedResult> => {
+export const testSupported: t.TestSupported = async (
+  files,
+  gameId,
+  archivePath,
+) => {
   const result: t.ISupportedResult = { requiredFiles: [], supported: false };
   if (gameId !== NEXUS_GAME_ID) return result; // wrong game
 
@@ -46,9 +47,7 @@ export const testSupported = async (
     if (
       sansDirectories
         .some((file) => disallowed.includes(basename(file).toLowerCase()))
-    ) {
-      return result; // includes bepinex core files, probably a bepinex pack, this installer won't handle that
-    }
+    ) return result; // includes bepinex core files, probably a bepinex pack, this installer won't handle that
 
     const assemblies = sansDirectories
       .filter((file) => extname(file).toLowerCase() === ".dll");
@@ -58,7 +57,7 @@ export const testSupported = async (
     // get vortex working path of mod being installed
     const id = archivePath && parse(archivePath).name;
     const workingPath = id && resolve(
-      installPath(api.getState()) ||
+      installPath(getState()) ||
         resolve(getVortexPath("userData"), gameId, "mods"),
       `${id}.installing`,
     );
@@ -66,7 +65,7 @@ export const testSupported = async (
     if (!workingPath) return result; // can't find working path, short circuit and let other installers handle it
 
     const plugins = assemblies.filter((assembly) => {
-      const analysis = getAssemblyAnalysis(resolve(workingPath, assembly), api);
+      const analysis = getAssemblyAnalysis(resolve(workingPath, assembly));
       if (!analysis) return false;
 
       const { BepInExAssemblies, BepInExPluginTypes } = analysis;
@@ -100,16 +99,12 @@ export const testSupported = async (
   }
 };
 
-export const install = async (
-  api: t.IExtensionApi,
-  files: string[],
-  workingPath: string,
-) => {
+export const install: t.InstallFunc = async (files, workingPath) => {
   const sansDirectories = files.filter((file) => !file.endsWith(sep));
   const plugin = sansDirectories.find((file) => {
     if (extname(file).toLowerCase() !== ".dll") return false;
 
-    const analysis = getAssemblyAnalysis(resolve(workingPath, file), api);
+    const analysis = getAssemblyAnalysis(resolve(workingPath, file));
     if (!analysis) return false;
 
     const { BepInExAssemblies, BepInExPluginTypes } = analysis;
@@ -126,27 +121,25 @@ export const install = async (
   const rooted = sansDirectories
     .filter((file) => dirname(file) === rootDir || isChildPath(file, rootDir));
 
-  const instructions = [
-    { type: "setmodtype", value: BEPINEX_5_PLUGIN_MOD_TYPE },
-    ...rooted.map((source): t.IInstruction => ({
-      type: "copy",
-      source,
-      destination: join(
-        dirname(source).split(sep).slice(rootIndex + 1).join(sep),
-        basename(source),
-      ),
-    })),
-  ] satisfies t.IInstruction[];
-
-  return { instructions } satisfies t.IInstallResult;
+  return {
+    instructions: [
+      { type: "setmodtype", value: BEPINEX_5_PLUGIN_MOD_TYPE },
+      ...rooted.map((source): t.IInstruction => ({
+        type: "copy",
+        source,
+        destination: join(
+          dirname(source).split(sep).slice(rootIndex + 1).join(sep),
+          basename(source),
+        ),
+      })),
+    ],
+  };
 };
 
-export const register = (context: t.IExtensionContext) =>
-  context.registerInstaller(
+export const register = () =>
+  context?.registerInstaller(
     BEPINEX_5_PLUGIN_MOD_TYPE,
     35,
-    (files, gameId, archivePath) =>
-      testSupported(context.api, files, gameId, archivePath),
-    (files, workingPath) => install(context.api, files, workingPath),
+    testSupported,
+    install,
   );
-export default register;
