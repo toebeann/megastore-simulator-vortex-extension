@@ -14,7 +14,7 @@ export const SAVE_FILE_MOD_TYPE = "save-file";
 
 export const isSupported = (gameId: string) => gameId === NEXUS_GAME_ID;
 
-export const getPath = getPersistentDataPath;
+export const getPath = () => getPersistentDataPath();
 
 export const test = async (
   instructions: t.IInstruction[],
@@ -30,7 +30,7 @@ export const register = () =>
     SAVE_FILE_MOD_TYPE,
     80,
     isSupported,
-    getPath as () => string,
+    getPath,
     test,
     { name: "Save File", mergeMods: true },
   );
