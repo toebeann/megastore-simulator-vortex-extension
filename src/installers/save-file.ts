@@ -5,9 +5,10 @@
  */
 import { basename, dirname, join, parse, resolve, sep } from "node:path";
 
+import { stat } from "fs-extra";
 import { isBinaryFile } from "isbinaryfile";
 import { quote } from "shell-quote";
-import { fs, selectors, type types as t, util } from "vortex-api";
+import { selectors, type types as t, util } from "vortex-api";
 
 import { NEXUS_GAME_ID } from "../constants";
 import { SAVE_FILE_MOD_TYPE } from "../modTypes/save-file";
@@ -18,7 +19,6 @@ import { exec } from "../util/powershell";
 import { getState } from "../util/vortex";
 import { context } from "..";
 
-import statAsync = fs.statAsync;
 import installPath = selectors.installPath;
 import getVortexPath = util.getVortexPath;
 import isChildPath = util.isChildPath;
@@ -115,7 +115,7 @@ export const install: t.InstallFunc = async (files) => {
         async (slot): Promise<[ValidSaveFile, SaveFileMapping]> => {
           try {
             const path = resolve(getSaveFolder(), slot);
-            const { size, mtime }: fs.Stats = await statAsync(path);
+            const { size, mtime } = await stat(path);
             const command = [
               quote(["Get-FileHash", path]),
               quote(["Select-Object", "-Expand", "Hash"]),

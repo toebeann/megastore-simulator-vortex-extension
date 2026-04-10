@@ -5,14 +5,12 @@
  */
 import { resolve } from "node:path";
 
+import { readFile } from "fs-extra";
 import parseAcf from "steam-acf-parser";
-import { fs, type types as t } from "vortex-api";
 
 import { STEAM_GAME_ID } from "../constants";
 import { getDiscovery } from "./vortex";
 import { nonEmptyStringSchema } from "./zod";
-
-import readFileAsync = fs.readFileAsync;
 
 export const getManifestPath = () => {
   const discovery = getDiscovery();
@@ -29,7 +27,7 @@ export const getManifestPath = () => {
 export const getManifest = async () => {
   const path = getManifestPath();
   if (path) {
-    const data = await readFileAsync(path, { encoding: "utf8" });
+    const data = await readFile(path, { encoding: "utf8" });
     const { data: text } = nonEmptyStringSchema.safeParse(data);
     if (text) return parseAcf(text);
   }

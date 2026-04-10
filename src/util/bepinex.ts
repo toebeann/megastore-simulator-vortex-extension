@@ -3,8 +3,9 @@
  * Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
  * with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import { access } from "node:fs/promises";
 import { join, resolve } from "node:path";
+
+import { access } from "fs-extra";
 
 import { BEPINEX_5_MOD_TYPE } from "../modTypes/bepinex-5";
 
