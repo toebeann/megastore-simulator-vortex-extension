@@ -9,7 +9,7 @@ import store2 from "store2";
 import * as z from "zod/mini";
 
 import { context } from "..";
-import { EXTENSION_ID } from "../constants";
+import { EXTENSION_ID, EXTENSION_NAME } from "../constants";
 import { getHtml } from "./macro" with { type: "macro" };
 
 export const store = store2
@@ -117,7 +117,7 @@ export const transform = (config?: Partial<TransformConfig>) => {
 export const show = async (
   htmlText: string,
   latest: Version,
-  title = "Megastore Simulator Vortex Extension has been updated",
+  title = `${EXTENSION_NAME} has been updated`,
 ) => {
   const { api: { dismissNotification, showDialog } } = context!;
   showDialog?.(
@@ -148,7 +148,7 @@ export const handle = async () => {
       id: "extension-updated",
       type: "success",
       title: "Extension updated",
-      message: "Megastore Simulator Vortex Extension updated",
+      message: `${EXTENSION_NAME} updated`,
       actions: [{
         title: "Changelog",
         action: () => show(output ?? input, latest),

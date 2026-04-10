@@ -46,7 +46,13 @@ import {
   store as changelogStore,
   transform,
 } from "./changelog";
-import { GAME_EXE, GAME_NAME, NEXUS_GAME_ID, STEAM_GAME_ID } from "./constants";
+import {
+  EXTENSION_NAME,
+  GAME_EXE,
+  GAME_NAME,
+  NEXUS_GAME_ID,
+  STEAM_GAME_ID,
+} from "./constants";
 
 import ensureDirWritableAsync = fs.ensureDirWritableAsync;
 import currentGame = selectors.currentGame;
@@ -161,7 +167,7 @@ export default function main(_context: t.IExtensionContext): boolean {
     "Changelog",
     () => {
       const { output, input, latest } = transform();
-      show(output ?? input, latest, "Megastore Simulator Vortex Extension");
+      show(output ?? input, latest, EXTENSION_NAME);
     },
     () => currentGame(getState())?.id === NEXUS_GAME_ID,
   );

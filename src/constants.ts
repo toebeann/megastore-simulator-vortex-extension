@@ -6,6 +6,8 @@
 export const EXTENSION_ID =
   "me.tobey.vortex.megastore-simulator-vortex-extension";
 
+export const EXTENSION_NAME = "Megastore Simulator Vortex Extension";
+
 export const NEXUS_GAME_ID = "megastoresimulator";
 
 export const GAME_PUBLISHER = "Yolo Games Studio";
