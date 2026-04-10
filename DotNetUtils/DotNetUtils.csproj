@@ -10,9 +10,11 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <DebugType>none</DebugType>
     <Configurations>Release</Configurations>
+    <GenerateNodeApiTypeDefinitionsForReferences>true</GenerateNodeApiTypeDefinitionsForReferences>
   </PropertyGroup>
 
   <ItemGroup>
+    <NodeApiSystemReferenceAssembly Include="System.Diagnostics.FileVersionInfo" />
     <PackageReference Include="AssetsTools.NET" Version="3.0.4" />
     <PackageReference Include="Microsoft.JavaScript.NodeApi" Version="0.9.*" />
     <PackageReference Include="Microsoft.JavaScript.NodeApi.Generator" Version="0.9.*" />

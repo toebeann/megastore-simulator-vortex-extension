@@ -8,8 +8,12 @@ export const EXTENSION_ID =
 
 export const NEXUS_GAME_ID = "megastoresimulator";
 
+export const GAME_PUBLISHER = "Yolo Games Studio";
+
 export const GAME_NAME = "Megastore Simulator";
 
-export const GAME_EXE = "Megastore Simulator.exe";
+export const GAME_EXE = `${GAME_NAME}.exe`;
+
+export const GAME_DATA_FOLDER = `${GAME_NAME}_Data`;
 
 export const STEAM_GAME_ID = "3819640";

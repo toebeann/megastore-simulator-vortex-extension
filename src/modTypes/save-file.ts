@@ -7,14 +7,14 @@ import type { types as t } from "vortex-api";
 
 import { NEXUS_GAME_ID } from "../constants";
 import { validSaveFiles } from "../installers/save-file";
-import { getSaveFolder } from "../util/getSaveFolder";
+import { getPersistentDataPath } from "../util/unity";
 import { context } from "..";
 
 export const SAVE_FILE_MOD_TYPE = "save-file";
 
 export const isSupported = (gameId: string) => gameId === NEXUS_GAME_ID;
 
-export const getPath = getSaveFolder;
+export const getPath = getPersistentDataPath;
 
 export const test = async (
   instructions: t.IInstruction[],
@@ -30,7 +30,7 @@ export const register = () =>
     SAVE_FILE_MOD_TYPE,
     80,
     isSupported,
-    getPath,
+    getPath as () => string,
     test,
     { name: "Save File", mergeMods: true },
   );

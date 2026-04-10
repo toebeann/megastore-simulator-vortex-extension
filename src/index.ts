@@ -29,15 +29,14 @@ import { register as registerModTypeBepInExConfigFile } from "./modTypes/bepinex
 import { register as registerModTypeSaveFile } from "./modTypes/save-file";
 
 import { dotnet } from "./dotnet";
-import { getGameVersion } from "./dotnet/getGameVersion";
 import {
   BEPINEX_CONFIG_DIR_PATH,
   BEPINEX_LOG_FILE_PATH,
   BEPINEX_MOD_PATH,
   validateBepInEx,
 } from "./util/bepinex";
-import { getSaveFolder } from "./util/getSaveFolder";
 import { resolveExtensionPath } from "./util/resolveExtensionPath";
+import { getGameVersion, getPersistentDataPath } from "./util/unity";
 import { getAllMods, getDiscovery, getState } from "./util/vortex";
 
 import {
@@ -100,7 +99,7 @@ export default function main(_context: t.IExtensionContext): boolean {
     "open-ext",
     {},
     "Open Save Folder",
-    () => util.opn(getSaveFolder()),
+    () => util.opn(getPersistentDataPath()),
     () => currentGame(getState())?.id === NEXUS_GAME_ID,
   );
 

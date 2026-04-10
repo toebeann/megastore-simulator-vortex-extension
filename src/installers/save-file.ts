@@ -14,8 +14,8 @@ import { NEXUS_GAME_ID } from "../constants";
 import { SAVE_FILE_MOD_TYPE } from "../modTypes/save-file";
 import { some } from "../util/async";
 import { BEPINEX_CORE_FILES } from "../util/bepinex";
-import { getSaveFolder } from "../util/getSaveFolder";
 import { exec } from "../util/powershell";
+import { getPersistentDataPath } from "../util/unity";
 import { getState } from "../util/vortex";
 import { context } from "..";
 
@@ -114,7 +114,7 @@ export const install: t.InstallFunc = async (files) => {
       validSaveFiles.map(
         async (slot): Promise<[ValidSaveFile, SaveFileMapping]> => {
           try {
-            const path = resolve(getSaveFolder(), slot);
+            const path = resolve(getPersistentDataPath(), slot);
             const { size, mtime } = await stat(path);
             const command = [
               quote(["Get-FileHash", path]),
