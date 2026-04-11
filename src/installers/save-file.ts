@@ -3,12 +3,13 @@
  * Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed
  * with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-import { basename, dirname, join, parse, resolve, sep } from "node:path";
+import { basename, dirname, join, resolve, sep } from "node:path";
 
 import { stat } from "fs-extra";
 import { isBinaryFile } from "isbinaryfile";
+import { partition } from "lodash";
 import { quote } from "shell-quote";
-import { selectors, type types as t, util } from "vortex-api";
+import { type types as t, util } from "vortex-api";
 
 import { NEXUS_GAME_ID } from "../constants";
 import { SAVE_FILE_MOD_TYPE } from "../modTypes/save-file";
@@ -16,10 +17,9 @@ import { some } from "../util/async";
 import { BEPINEX_CORE_FILES } from "../util/bepinex";
 import { exec } from "../util/powershell";
 import { getPersistentDataPath } from "../util/unity";
-import { getState } from "../util/vortex";
 import { context } from "..";
+import { install as fallback } from "./fallback";
 
-import installPath = selectors.installPath;
 import isChildPath = util.isChildPath;
 import NotSupportedError = util.NotSupportedError;
 
@@ -35,62 +35,30 @@ export type ValidSaveFile = typeof validSaveFiles[number];
 export const deletedSlotHash =
   "2E59EE266815625D19A361AE2ACC75720EE239B61FD892F92D1451DC3A977EB8" as const;
 
-export const testSupported: t.TestSupported = async (
-  files,
-  gameId,
-  archivePath,
-) => {
+export const testSupported: t.TestSupported = async (files, gameId) => {
   const result: t.ISupportedResult = { requiredFiles: [], supported: false };
   if (gameId !== NEXUS_GAME_ID) return result; // wrong game
 
-  try {
-    const sansDirectories = files.filter((file) => !file.endsWith(sep));
+  const sansDirectories = files.filter((file) => !file.endsWith(sep));
 
-    const disallowed = ["winhttp.dll", ...BEPINEX_CORE_FILES]
-      .map((name) => name.toLowerCase());
+  const disallowed = ["winhttp.dll", ...BEPINEX_CORE_FILES]
+    .map((name) => name.toLowerCase());
 
-    if (
-      sansDirectories
-        .some((file) => disallowed.includes(basename(file).toLowerCase()))
-    ) {
-      return result; // includes bepinex core files, probably a bepinex pack, this installer won't handle that
-    }
-
-    const saveFiles = sansDirectories
-      .filter((file) => validSaveFiles.includes(basename(file)));
-
-    if (!saveFiles.length || saveFiles.length > 4) return result; // no save files (or too many), can't be a save file
-
-    // get vortex working path of mod being installed
-    const { api: { getPath } } = context!;
-    const id = archivePath && parse(archivePath).name;
-    const workingPath = id && resolve(
-      installPath(getState()) ||
-        resolve(getPath("userData"), gameId, "mods"),
-      `${id}.installing`,
-    );
-
-    if (!workingPath) return result; // can't find working path, short circuit and let other installers handle it
-
-    const saveDir = dirname(saveFiles[0]!);
-
-    const outsideSaveDir = sansDirectories.filter((file) =>
-      dirname(file) !== saveDir && !isChildPath(file, saveDir)
-    );
-
-    // if any binary files found outside folder containing save file, we don't support this archive
-    result.supported = !await some(
-      outsideSaveDir,
-      (file) => isBinaryFile(resolve(workingPath, file)),
-    );
-  } catch (e) {
-    console.error(e);
-  } finally {
-    return result; // encountered an error checking the archive files, let other installers handle it
+  if (
+    sansDirectories
+      .some((file) => disallowed.includes(basename(file).toLowerCase()))
+  ) {
+    return result; // includes bepinex core files, probably a bepinex pack, this installer won't handle that
   }
+
+  const saveFiles = sansDirectories
+    .filter((file) => validSaveFiles.includes(basename(file)));
+
+  result.supported = saveFiles.length >= 1 && saveFiles.length <= 4;
+  return result;
 };
 
-export const install: t.InstallFunc = async (files) => {
+export const install: t.InstallFunc = async (files, workingPath, ...rest) => {
   interface SaveFileMapping {
     slot: ValidSaveFile;
     size: number;
@@ -105,9 +73,18 @@ export const install: t.InstallFunc = async (files) => {
     .find((file) => validSaveFiles.includes(basename(file)))!;
 
   const rootDir = dirname(saveFile);
+
+  const [rooted, outside] = partition(
+    sansDirectories,
+    (file) => dirname(file) === rootDir || isChildPath(file, rootDir),
+  );
+
+  // if any binary files found outside folder containing save file, we don't support this archive
+  if (await some(outside, (file) => isBinaryFile(resolve(workingPath, file)))) {
+    return fallback(files, workingPath, ...rest);
+  }
+
   const rootIndex = rootDir.split(sep).length;
-  const rooted = sansDirectories
-    .filter((file) => dirname(file) === rootDir || isChildPath(file, rootDir));
 
   const saveSlotMap = new Map(
     await Promise.all(

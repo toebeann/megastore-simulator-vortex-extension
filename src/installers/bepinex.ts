@@ -19,22 +19,18 @@ export const testSupported: t.TestSupported = async (files, gameId) => {
   const result: t.ISupportedResult = { requiredFiles: [], supported: false };
   if (gameId !== NEXUS_GAME_ID) return result;
 
-  try {
-    const filesLowerCase = files
-      .filter((file) => !file.endsWith(sep))
-      .map((file) => file.toLowerCase());
+  const filesLowerCase = files
+    .filter((file) => !file.endsWith(sep))
+    .map((file) => file.toLowerCase());
 
-    result.supported = filesLowerCase
-      .some((file) => file.split(sep)[0] === BEPINEX_DIR.toLowerCase()) &&
-      BEPINEX_CORE_FILES.every((file) =>
-        filesLowerCase
-          .includes(join(BEPINEX_DIR, BEPINEX_CORE_DIR, file).toLowerCase())
-      );
-  } catch (e) {
-    console.error(e);
-  } finally {
-    return result;
-  }
+  result.supported = filesLowerCase
+    .some((file) => file.split(sep)[0] === BEPINEX_DIR.toLowerCase()) &&
+    BEPINEX_CORE_FILES.every((file) =>
+      filesLowerCase
+        .includes(join(BEPINEX_DIR, BEPINEX_CORE_DIR, file).toLowerCase())
+    );
+
+  return result;
 };
 
 export const install: t.InstallFunc = async (files) => {

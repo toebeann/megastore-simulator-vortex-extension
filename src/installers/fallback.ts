@@ -6,7 +6,7 @@
 import { basename, dirname, join, normalize, sep } from "node:path";
 
 import { globSync, type Options } from "fast-glob";
-import partition from "lodash/partition";
+import { partition } from "lodash";
 import { type types as t, util } from "vortex-api";
 
 import { NEXUS_GAME_ID } from "../constants";

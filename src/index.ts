@@ -16,7 +16,7 @@ import { version } from "../package.json";
 
 import { register as registerInstallerAdditionalProductsPack } from "./installers/additional-products";
 import { register as registerInstallerBepInEx } from "./installers/bepinex";
-import { register as registerInstallerBepInEx5Plugin } from "./installers/bepinex-5-plugin";
+import { register as registerInstallerDll } from "./installers/dll";
 import { register as registerInstallerBepInExConfigFile } from "./installers/bepinex-config-file";
 import { register as registerInstallerFallback } from "./installers/fallback";
 import { register as registerInstallerSaveFile } from "./installers/save-file";
@@ -180,7 +180,7 @@ export default function main(_context: t.IExtensionContext): boolean {
   registerModTypeAdditionalProductsPack();
 
   registerInstallerBepInEx();
-  registerInstallerBepInEx5Plugin();
+  registerInstallerDll();
   registerInstallerSaveFile();
   registerInstallerBepInExConfigFile();
   registerInstallerAdditionalProductsPack();

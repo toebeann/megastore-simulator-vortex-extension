@@ -2,82 +2,50 @@ import { basename, dirname, extname, join, resolve, sep } from "node:path";
 
 import { load } from "cheerio";
 import { readFile } from "fs-extra";
-import { selectors, type types as t, util } from "vortex-api";
+import { type types as t, util } from "vortex-api";
 
 import { NEXUS_GAME_ID } from "../constants";
 import {
   ADDITIONAL_PRODUCTS_PACK_DIR,
   ADDITIONAL_PRODUCTS_PACK_MOD_TYPE,
 } from "../modTypes/additional-products";
-import { some } from "../util/async";
 import { BEPINEX_CORE_FILES } from "../util/bepinex";
-import { getState } from "../util/vortex";
 import { context } from "..";
+import { install as fallback } from "./fallback";
 
-import installPath = selectors.installPath;
 import isChildPath = util.isChildPath;
 
-export const testSupported: t.TestSupported = async (
-  files,
-  gameId,
-  archivePath,
-) => {
+export const testSupported: t.TestSupported = async (files, gameId) => {
   const result: t.ISupportedResult = { requiredFiles: [], supported: false };
-  if (gameId !== NEXUS_GAME_ID || !archivePath) return result;
+  if (gameId !== NEXUS_GAME_ID) return result;
 
-  try {
-    const sansDirectories = files
-      .filter((file) => !file.endsWith(sep));
+  const sansDirectories = files
+    .filter((file) => !file.endsWith(sep));
 
-    const disallowed = ["winhttp.dll", ...BEPINEX_CORE_FILES]
-      .map((name) => name.toLowerCase());
+  const disallowed = ["winhttp.dll", ...BEPINEX_CORE_FILES]
+    .map((name) => name.toLowerCase());
 
-    if (
-      sansDirectories
-        .some((file) => disallowed.includes(basename(file).toLowerCase()))
-    ) return result; // includes bepinex core files, probably a bepinex pack, this installer won't handle that
+  if (
+    sansDirectories
+      .some((file) => disallowed.includes(basename(file).toLowerCase()))
+  ) return result; // includes bepinex core files, probably a bepinex pack, this installer won't handle that
 
-    const manifests = sansDirectories
-      .filter((file) => basename(file).toLowerCase() === "manifest.xml");
+  const manifest = sansDirectories
+    .find((file) => basename(file).toLowerCase() === "manifest.xml");
 
-    if (!manifests.length) return result;
-
-    // get vortex working path of mod being installed
-    const { api: { getPath } } = context!;
-    const id = basename(archivePath, extname(archivePath));
-    const workingPath = resolve(
-      installPath(getState()) ||
-        resolve(getPath("userData"), gameId, "mods"),
-      `${id}.installing`,
-    );
-
-    result.supported = await some(manifests, async (xml) => {
-      try {
-        const path = resolve(workingPath, xml);
-        const text = await readFile(path, { encoding: "utf8" });
-        const $ = load(text, { xml: true }, false);
-        const $root = $(":root").first();
-        const $name = $root.find("> Name").first();
-        return $root[0]!.name === "Product" && $name.length === 1;
-      } catch {
-        return false;
-      }
-    });
-  } catch (e) {
-    console.error(e);
-  } finally {
-    return result; // encountered an error checking the archive files, let other installers handle it
-  }
+  result.supported = Boolean(manifest);
+  return result;
 };
 
 export const install: t.InstallFunc = async (
   files,
   workingPath,
-  _gameId,
-  _progressDelegate,
-  _choices,
-  _unatended,
+  gameId,
+  progressDelegate,
+  choices,
+  unattended,
   archivePath,
+  ...rest
 ) => {
   const sansDirectories = files.filter((file) => !file.endsWith(sep));
   const manifests = sansDirectories
@@ -116,6 +84,20 @@ export const install: t.InstallFunc = async (
       return false;
     }
   }))).filter(Boolean);
+
+  // no valid product manifests detected, use the fallback installer instead
+  if (!products.length) {
+    return fallback(
+      files,
+      workingPath,
+      gameId,
+      progressDelegate,
+      choices,
+      unattended,
+      archivePath,
+      ...rest,
+    );
+  }
 
   return {
     instructions: [
