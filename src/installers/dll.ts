@@ -61,6 +61,9 @@ export const install: t.InstallFunc = async (files, workingPath, ...rest) => {
   // no bepinex 5 plugins detected, use the fallback installer instead
   if (!plugin) return fallback(files, workingPath, ...rest);
 
+  // TODO: implement handling for bepinex 6 plugins (warn user it's not supported)
+  // TODO: implement handling for melonloader mods (warn user it's not supported)
+
   const pluginDir = dirname(plugin);
 
   const rootIndex = pluginDir

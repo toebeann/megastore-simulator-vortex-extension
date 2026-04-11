@@ -24,6 +24,9 @@ export const install: t.InstallFunc = async (files) => {
   const gamePath = getDiscovery()?.path;
   const [onlyDirs, onlyFiles] = partition(files, (file) => file.endsWith(sep));
 
+  // TODO: implement warning letting the user know we're using a fallback and the mod may not be correctly installed
+  // maybe provide links to contact me for getting the mod supported
+
   if (!gamePath || !onlyDirs.length) {
     return {
       instructions: [
