@@ -170,9 +170,4 @@ export const install: t.InstallFunc = async (files) => {
 };
 
 export const register = () =>
-  context?.registerInstaller(
-    SAVE_FILE_MOD_TYPE,
-    30,
-    testSupported,
-    install,
-  );
+  context?.registerInstaller(SAVE_FILE_MOD_TYPE, 30, testSupported, install);

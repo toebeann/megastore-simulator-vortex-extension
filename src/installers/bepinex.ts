@@ -53,9 +53,4 @@ export const install: t.InstallFunc = async (files) => {
 };
 
 export const register = () =>
-  context?.registerInstaller(
-    "bepinex",
-    50,
-    testSupported,
-    install,
-  );
+  context?.registerInstaller("bepinex", 50, testSupported, install);
