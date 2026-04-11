@@ -75,12 +75,11 @@ export const install: t.InstallFunc = async (files) => {
     instructions: [
       { type: "setmodtype", value: "dinput" },
       ...onlyFiles.reduce((instructions, source) => {
-        const map = sorted.find(([key]) =>
-          isChildPath(
-            source.toLowerCase(),
-            (JSON.parse(key) as [string, string])[0],
-          )
-        );
+        const map = sorted.find(([key]) => {
+          const [sourceDir] = JSON.parse(key) as [string, string];
+          return sourceDir === "." ||
+            isChildPath(source.toLowerCase(), sourceDir);
+        });
 
         if (map) {
           const [key] = map;
