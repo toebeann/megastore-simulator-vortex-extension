@@ -26,9 +26,8 @@ if (import.meta.main) {
   const { values: config } = parseArgs({
     args: argv,
     allowPositionals: true,
-    allowNegative: true,
     options: {
-      update: { type: "boolean", default: true },
+      update: { type: "boolean", default: false },
     },
     strict: true,
   });

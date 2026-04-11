@@ -11,6 +11,7 @@
     <DebugType>none</DebugType>
     <Configurations>Release</Configurations>
     <GenerateNodeApiTypeDefinitionsForReferences>true</GenerateNodeApiTypeDefinitionsForReferences>
+    <NodeApiJSModuleType>esm</NodeApiJSModuleType>
   </PropertyGroup>
 
   <ItemGroup>
