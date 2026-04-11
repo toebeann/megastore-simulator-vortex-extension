@@ -97,7 +97,7 @@ export const validateBepInEx = async () => {
           }
           : {
             title: translate("Install", TRANSLATION_OPTIONS),
-            action: () => installMod(2),
+            action: () => installMod(BEPINEX_NEXUS_ID),
           },
       ],
     });
