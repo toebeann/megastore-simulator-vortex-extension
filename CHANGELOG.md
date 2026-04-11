@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.1] - 2026-04-11
+
+### Fixed
+
+- Correctly determine best source <-> destination mapping when archive is rooted to game folder ([`6607a4d`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/6607a4d))
+
 ## [1.3.0] - 2026-04-11
 
 ### Added
@@ -45,6 +51,7 @@
 
 _Initial release 🚀_
 
+[1.3.1]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.1
 [1.3.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.0
 [1.2.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.2.0
 [1.1.1]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.1.1
