@@ -45,7 +45,10 @@
     "postbuild": "bun bundle",
     "prebundle": "rm $npm_package_name.7z* 2>/dev/null; cp LICENSE ./dist/LICENSE",
     "bundle": "bun install:7zip; 7z a -t7z -x!meta.md $npm_package_name.7z ./dist/*",
-    "dev": "bun run build --features DEVTOOLS",
+    "predev": "bun tpk --no-update; rm -r dist; mkdir dist",
+    "dev": "extractInfo && bun build/ --features DEVTOOLS",
+    "postdev": "bun bundle",
+    "dev:full": "bun run build --features DEVTOOLS",
     "predist": "bun tpk",
     "dist": "bun run build --drop console --drop debugger --no-sourcemap"
   },
