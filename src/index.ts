@@ -18,6 +18,7 @@ import { register as registerInstallerAdditionalProductsPack } from "./installer
 import { register as registerInstallerBepInEx } from "./installers/bepinex";
 import { register as registerInstallerBepInEx5Plugin } from "./installers/bepinex-5-plugin";
 import { register as registerInstallerBepInExConfigFile } from "./installers/bepinex-config-file";
+import { register as registerInstallerFallback } from "./installers/fallback";
 import { register as registerInstallerSaveFile } from "./installers/save-file";
 import {
   ADDITIONAL_PRODUCTS_PACK_DIR,
@@ -183,9 +184,9 @@ export default function main(_context: t.IExtensionContext): boolean {
   registerInstallerSaveFile();
   registerInstallerBepInExConfigFile();
   registerInstallerAdditionalProductsPack();
+  registerInstallerFallback();
 
   // TODO: register an installer & mod type for bepinex patchers
-  // TODO: register a fallback installer & mod type at prio 99 to handle archives that are rooted to the game folder
 
   context.once(() => {
     if (feature("DEVTOOLS")) {
