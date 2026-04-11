@@ -1,11 +1,20 @@
 # Changelog
 
+## [1.3.0] - 2026-04-11
+
+### Added
+
+- Implement fallback installer for unknown mod types ([`eb2fb11`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/eb2fb11))
+
+    Where possible, attempts to intelligently calculate appropriate installation location by comparing archive folder structure with game folder structure, otherwise simply installs archive contents directly to game folder
+
 ## [1.2.0] - 2026-04-09
 
 ### Added
 
 - Implement installer to handle product packs for [Additional Products](https://www.nexusmods.com/megastoresimulator/mods/34) ([`7a5f2b7`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/7a5f2b7))
-    - Intelligently calculates appropriate installation location based on `manifest.xml` and archive folder structure
+
+    Intelligently calculates appropriate installation location based on `manifest.xml` and archive folder structure
 
 ## [1.1.1] - 2026-04-05
 
@@ -36,7 +45,8 @@
 
 _Initial release 🚀_
 
-[1.0.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.0.0
-[1.1.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.1.0
-[1.1.1]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.1.1
+[1.3.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.0
 [1.2.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.2.0
+[1.1.1]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.1.1
+[1.1.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.1.0
+[1.0.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.0.0
