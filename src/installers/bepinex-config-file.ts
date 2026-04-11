@@ -78,7 +78,7 @@ export const install: t.InstallFunc = async (files, workingPath, ...rest) => {
 export const register = () =>
   context?.registerInstaller(
     BEPINEX_CONFIG_FILE_MOD_TYPE,
-    35,
+    40,
     testSupported,
     install,
   );
