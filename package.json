@@ -47,7 +47,7 @@
     "postbuild": "bun 7z",
     "pre7z": "rm $npm_package_name.7z* 2>/dev/null; cp LICENSE ./dist/LICENSE",
     "7z": "7z a -t7z -x!meta.md $npm_package_name.7z ./dist/*",
-    "dev": "bun run build --features DEVTOOLS",
+    "dev": "bun run build --features DEVTOOLS --no-minify",
     "prerelease": "bun tpk --update",
     "release": "bun run build --drop console --drop debugger --no-sourcemap"
   },
