@@ -15,7 +15,6 @@ import { getState } from "../util/vortex";
 import { context } from "..";
 
 import installPath = selectors.installPath;
-import getVortexPath = util.getVortexPath;
 import isChildPath = util.isChildPath;
 
 export const testSupported: t.TestSupported = async (
@@ -44,10 +43,11 @@ export const testSupported: t.TestSupported = async (
     if (!manifests.length) return result;
 
     // get vortex working path of mod being installed
+    const { api: { getPath } } = context!;
     const id = basename(archivePath, extname(archivePath));
     const workingPath = resolve(
       installPath(getState()) ||
-        resolve(getVortexPath("userData"), gameId, "mods"),
+        resolve(getPath("userData"), gameId, "mods"),
       `${id}.installing`,
     );
 

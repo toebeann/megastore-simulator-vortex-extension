@@ -20,7 +20,6 @@ import { getState } from "../util/vortex";
 import { context } from "..";
 
 import installPath = selectors.installPath;
-import getVortexPath = util.getVortexPath;
 import isChildPath = util.isChildPath;
 import NotSupportedError = util.NotSupportedError;
 
@@ -63,10 +62,11 @@ export const testSupported: t.TestSupported = async (
     if (!saveFiles.length || saveFiles.length > 4) return result; // no save files (or too many), can't be a save file
 
     // get vortex working path of mod being installed
+    const { api: { getPath } } = context!;
     const id = archivePath && parse(archivePath).name;
     const workingPath = id && resolve(
       installPath(getState()) ||
-        resolve(getVortexPath("userData"), gameId, "mods"),
+        resolve(getPath("userData"), gameId, "mods"),
       `${id}.installing`,
     );
 
