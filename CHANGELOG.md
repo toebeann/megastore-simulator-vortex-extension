@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.3.4] - 2026-04-12
+
+_This update is functionally equivalent to [1.3.2] and [1.3.3], with just the game art changed to not include text as per Nexus Mods requirements._
+
 ## [1.3.3] - 2026-04-12
 
 _This update is functionally equivalent to [1.3.2], with just the game art converted to png to make Nexus Mod's staff life easier._
@@ -59,6 +63,7 @@ _This update is functionally equivalent to [1.3.2], with just the game art conve
 
 _Initial release 🚀_
 
+[1.3.4]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.4
 [1.3.3]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.3
 [1.3.2]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.2
 [1.3.1]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.1
