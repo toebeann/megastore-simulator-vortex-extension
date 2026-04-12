@@ -10,7 +10,7 @@ import { resolve } from "node:path";
 import { actions, fs, selectors, type types as t, util } from "vortex-api";
 
 // @ts-expect-error
-import logo from "../assets/gameart.jpg";
+import logo from "../assets/gameart.png";
 
 import { version } from "../package.json";
 
