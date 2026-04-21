@@ -22,6 +22,8 @@ import {
 } from "./vortex";
 import { context } from "..";
 
+import opn = util.opn;
+
 export const BEPINEX_NEXUS_ID = 2;
 
 export const BEPINEX_DIR = "BepInEx";
@@ -102,7 +104,7 @@ export const validateBepInEx = async () => {
                 .catch(() => false)
                 .then((success) =>
                   success ||
-                  util.opn(
+                  opn(
                     `https://www.nexusmods.com/${NEXUS_GAME_ID}/mods/${BEPINEX_NEXUS_ID}`,
                   )
                 ),
