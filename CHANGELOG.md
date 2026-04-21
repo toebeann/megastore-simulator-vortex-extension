@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.5] - 2026-04-21
+
+### Fixed
+
+- Resolve an issue where the automatic installation of the BepInEx pack can fail for some users ([`abce4e2`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/abce4e2), [`71368c7`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/71368c7))
+
 ## [1.3.4] - 2026-04-12
 
 _This update is functionally equivalent to [1.3.2] and [1.3.3], with just the game art changed to not include text as per Nexus Mods requirements._
@@ -63,6 +69,7 @@ _This update is functionally equivalent to [1.3.2], with just the game art conve
 
 _Initial release 🚀_
 
+[1.3.5]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.5
 [1.3.4]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.4
 [1.3.3]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.3
 [1.3.2]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.2
