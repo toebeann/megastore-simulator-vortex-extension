@@ -119,8 +119,7 @@ export const show = async (
   latest: Version,
   title = `${EXTENSION_NAME} has been updated`,
 ) => {
-  const { api: { dismissNotification, showDialog } } = context!;
-  showDialog?.(
+  context?.api.showDialog?.(
     "info",
     title,
     { htmlText },
@@ -128,7 +127,7 @@ export const show = async (
       label: "I understand",
       action: () => {
         store(LAST_SEEN, latest);
-        dismissNotification?.("extension-updated");
+        context?.api.dismissNotification?.("extension-updated");
       },
     }],
   );
@@ -142,9 +141,7 @@ export const handle = async () => {
   if (hasUpdate) {
     store(LAST_USED, latest);
 
-    const { api: { sendNotification } } = context;
-
-    sendNotification?.({
+    context.api.sendNotification?.({
       id: "extension-updated",
       type: "success",
       title: "Extension updated",
