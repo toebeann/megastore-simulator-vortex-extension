@@ -14,7 +14,7 @@ import currentGame = selectors.currentGame;
 import discoveryByGame = selectors.discoveryByGame;
 import lastActiveProfileForGame = selectors.lastActiveProfileForGame;
 import profileById = selectors.profileById;
-import toPromise = util.toPromise;
+import _toPromise = util.toPromise;
 
 export const TRANSLATION_OPTIONS = {
   replace: {
@@ -99,7 +99,7 @@ export const getUninstalledMods = (
     .map((id) => ({ id, state: "uninstalled" as const }));
 };
 
-export const reinstallMod = async (
+const reinstallMod = async (
   mod: t.IMod,
   gameId: string = NEXUS_GAME_ID,
 ): Promise<boolean> => {
@@ -110,12 +110,16 @@ export const reinstallMod = async (
     return false;
   }
 
-  return await toPromise((callback) =>
-    context!.api.events.emit("start-install-download", mod.archiveId, {
+  try {
+    await startInstallDownload(mod.archiveId, {
       choices: mod.attributes?.installerChoices,
       allowAutoEnable: false,
-    }, callback)
-  );
+    });
+    return true;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
 };
 
 export const setModsEnabled = async (enabled: boolean, ...modIds: string[]) => {
@@ -144,8 +148,7 @@ export const installMod = async (
   }),
   gameId = NEXUS_GAME_ID,
 ) => {
-  const { api: { events: { emit }, ext: { nexusGetModFiles } } } = context!;
-  const files = await nexusGetModFiles?.(gameId, modId);
+  const files = await context?.api.ext.nexusGetModFiles?.(gameId, modId);
   if (!files) return false;
 
   const filtered = filterFiles(files);
@@ -155,22 +158,18 @@ export const installMod = async (
     await Promise.all(filtered.map(async ({ file_id, name, file_name }) => {
       const url = `nxm://${NEXUS_GAME_ID}/mods/${modId}/files/${file_id}`;
 
-      const downloadId = await toPromise((callback) =>
-        emit(
-          "start-download",
-          [url],
-          { game: NEXUS_GAME_ID, name },
-          file_name,
-          callback,
-          "never",
-          { allowInstall: false },
-        )
+      const downloadId = await startDownload(
+        [url],
+        { game: NEXUS_GAME_ID, name },
+        file_name,
+        "never",
+        { allowInstall: false },
       );
 
-      const installId = await toPromise((callback) =>
-        emit("start-install-download", downloadId, {
-          allowAutoEnable: false,
-        }, callback)
+      const installId = await startInstallDownload(
+        downloadId,
+        { allowAutoEnable: false },
+        "bepinex",
       );
 
       await setModsEnabled(true, installId);
@@ -181,3 +180,46 @@ export const installMod = async (
     return false;
   }
 };
+
+const toPromise = <T = unknown, E = unknown>(
+  func: (cb: (error: E, result: T) => any) => void,
+): Promise<T> => _toPromise(func);
+
+const startDownload = (
+  urls: string[],
+  modInfo: t.IModInfo,
+  fileName: string,
+  redownload?: string,
+  ...rest: any[]
+) =>
+  toPromise<string>((callback) =>
+    context?.api.events.emit(
+      "start-download",
+      urls,
+      modInfo,
+      fileName,
+      callback,
+      redownload,
+      ...rest,
+    )
+  );
+
+const startInstallDownload = (
+  downloadId: string,
+  allowAutoEnable?: boolean | {
+    allowAutoEnable?: boolean;
+    [x: string]: unknown;
+  },
+  forceInstaller?: string,
+  ...rest: any[]
+) =>
+  toPromise<string>((callback) =>
+    context?.api.events.emit(
+      "start-install-download",
+      downloadId,
+      allowAutoEnable,
+      callback,
+      forceInstaller,
+      ...rest,
+    )
+  );
