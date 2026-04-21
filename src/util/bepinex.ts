@@ -6,9 +6,11 @@
 import { join, resolve } from "node:path";
 
 import { access } from "fs-extra";
+import { util } from "vortex-api";
 
 import { BEPINEX_5_MOD_TYPE } from "../modTypes/bepinex-5";
 
+import { NEXUS_GAME_ID } from "../constants";
 import {
   getDisabledMods,
   getDiscovery,
@@ -76,33 +78,38 @@ export const validateBepInEx = async () => {
       .filter(({ type }) => type === BEPINEX_5_MOD_TYPE);
     const disabledBepInEx = potentials.length === 1 ? potentials[0] : undefined;
 
-    const { api: { sendNotification, translate } } = context!;
-
-    sendNotification?.({
+    context?.api.sendNotification?.({
       id: "bepinex-missing",
       type: "warning",
-      title: translate(
+      title: context?.api.translate(
         `{{bepinex}} is ${disabledBepInEx ? "disabled" : "not installed"}`,
         TRANSLATION_OPTIONS,
       ),
-      message: translate(
+      message: context?.api.translate(
         "{{bepinex}} is required to mod {{game}}",
         TRANSLATION_OPTIONS,
       ),
       actions: [
         disabledBepInEx
           ? {
-            title: translate("Enable"),
+            title: context?.api.translate("Enable"),
             action: () => setModsEnabled(true, disabledBepInEx.id),
           }
           : {
-            title: translate("Install", TRANSLATION_OPTIONS),
-            action: () => installMod(BEPINEX_NEXUS_ID),
+            title: context?.api.translate("Install", TRANSLATION_OPTIONS),
+            action: () =>
+              installMod(BEPINEX_NEXUS_ID)
+                .catch(() => false)
+                .then((success) =>
+                  success ||
+                  util.opn(
+                    `https://www.nexusmods.com/${NEXUS_GAME_ID}/mods/${BEPINEX_NEXUS_ID}`,
+                  )
+                ),
           },
       ],
     });
   } else {
-    const { api: { dismissNotification } } = context!;
-    dismissNotification?.("bepinex-missing");
+    context?.api.dismissNotification?.("bepinex-missing");
   }
 };
