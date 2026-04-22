@@ -302,7 +302,7 @@
 
     "verror": ["verror@1.10.0", "", { "dependencies": { "assert-plus": "^1.0.0", "core-util-is": "1.0.2", "extsprintf": "^1.2.0" } }, "sha512-ZZKSmDAEFOijERBLkmYfJ+vmk3w+7hOLYDNkRCuRuMJGEmqYNCNLyBBFwWKVMhfwaEF3WOd0Zlw86U/WC/+nYw=="],
 
-    "vortex-api": ["vortex-api@github:Nexus-Mods/vortex-api#d8478b6", { "bin": { "extractInfo": "./bin/extractInfo.js" } }, "Nexus-Mods-vortex-api-d8478b6", "sha512-f4K9+KKDqPuyi6sSvmrwxZPtSox7JAZnU9DJTXKe/8hLECxjFyy+4DtpOwNMmn8RXele1Cw6zfxwOZx1COOlZA=="],
+    "vortex-api": ["vortex-api@github:Nexus-Mods/vortex-api#0b8ecba", { "bin": { "extractInfo": "./bin/extractInfo.js" } }, "Nexus-Mods-vortex-api-0b8ecba", "sha512-or64ayvHq+qqm7Kh6Si4imlM1MC87FJZovdFldOGieJtCRcQJUZO30GrMqd7Aj9fLt2za4grTVC+tlyKKSl2hg=="],
 
     "whatwg-encoding": ["whatwg-encoding@3.1.1", "", { "dependencies": { "iconv-lite": "0.6.3" } }, "sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ=="],
 
