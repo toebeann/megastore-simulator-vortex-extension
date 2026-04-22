@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.6] - 2026-04-22
+
+### Changed
+
+- Improve destination path determination for [Additional Products] packs ([`e2128fc`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/e2128fc))
+
 ## [1.3.5] - 2026-04-21
 
 ### Fixed
@@ -37,7 +43,7 @@ _This update is functionally equivalent to [1.3.2], with just the game art conve
 
 ### Added
 
-- Implement installer to handle product packs for [Additional Products](https://www.nexusmods.com/megastoresimulator/mods/34) ([`7a5f2b7`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/7a5f2b7))
+- Implement installer to handle product packs for [Additional Products] ([`7a5f2b7`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/7a5f2b7))
   Intelligently calculates appropriate installation location based on `manifest.xml` and archive folder structure
 
 ## [1.1.1] - 2026-04-05
@@ -69,6 +75,7 @@ _This update is functionally equivalent to [1.3.2], with just the game art conve
 
 _Initial release 🚀_
 
+[1.3.6]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.6
 [1.3.5]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.5
 [1.3.4]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.4
 [1.3.3]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.3
@@ -79,3 +86,4 @@ _Initial release 🚀_
 [1.1.1]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.1.1
 [1.1.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.1.0
 [1.0.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.0.0
+[Additional Products]: https://www.nexusmods.com/megastoresimulator/mods/34
