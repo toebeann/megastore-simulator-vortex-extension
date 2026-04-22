@@ -100,14 +100,11 @@ export const validateBepInEx = async () => {
           : {
             title: context?.api.translate("Install", TRANSLATION_OPTIONS),
             action: () =>
-              installMod(BEPINEX_NEXUS_ID)
-                .catch(() => false)
-                .then((success) =>
-                  success ||
-                  opn(
-                    `https://www.nexusmods.com/${NEXUS_GAME_ID}/mods/${BEPINEX_NEXUS_ID}`,
-                  )
-                ),
+              installMod(BEPINEX_NEXUS_ID).catch(() => false).then((success) =>
+                success || opn(
+                  `https://www.nexusmods.com/${NEXUS_GAME_ID}/mods/${BEPINEX_NEXUS_ID}`,
+                )
+              ),
           },
       ],
     });
