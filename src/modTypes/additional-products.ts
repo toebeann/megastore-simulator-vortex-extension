@@ -4,12 +4,12 @@ import { type types as t, util } from "vortex-api";
 
 import { context } from "@";
 import { NEXUS_GAME_ID } from "@/constants";
-import { getDiscovery } from "@/util/vortex";
 import {
   BEPINEX_CORE_FILES,
   BEPINEX_DIR,
   BEPINEX_MOD_PATH,
 } from "@/util/bepinex";
+import { getDiscovery } from "@/util/vortex";
 
 import isChildPath = util.isChildPath;
 
