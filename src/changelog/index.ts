@@ -6,7 +6,7 @@
 import { load } from "cheerio";
 import { gte, lt, major, valid } from "semver";
 import store2 from "store2";
-import * as z from "zod/mini";
+import { _default, number, object, optional, string, type z } from "zod/mini";
 
 import { context } from "@";
 import { EXTENSION_ID, EXTENSION_NAME } from "@/constants";
@@ -18,10 +18,7 @@ export const store = store2
   .namespace("common-changelog")
   .namespace("draft");
 
-const versionSchema = z.object({
-  version: z.string(),
-  date: z.optional(z.number()),
-});
+const versionSchema = object({ version: string(), date: optional(number()) });
 type Version = z.infer<typeof versionSchema>;
 
 const LAST_USED = "last-version-used" as const;
@@ -29,8 +26,8 @@ const LAST_SEEN = "last-changelog-seen" as const;
 const FALLBACK_VERSION = "1.0.0" as const;
 const FALLBACK_DATE = "2026-03-25" as const;
 
-const transformConfigSchema = z.object({
-  lastSeen: z._default(
+const transformConfigSchema = object({
+  lastSeen: _default(
     versionSchema,
     () =>
       versionSchema.safeParse(store(LAST_SEEN)).data ?? {
@@ -38,7 +35,7 @@ const transformConfigSchema = z.object({
         date: Date.parse(FALLBACK_DATE),
       },
   ),
-  lastUsed: z._default(
+  lastUsed: _default(
     versionSchema,
     () =>
       versionSchema.safeParse(store(LAST_USED)).data ??
