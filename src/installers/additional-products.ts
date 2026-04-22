@@ -52,35 +52,38 @@ export const install: t.InstallFunc = async (
   const manifests = sansDirectories
     .filter((file) => basename(file).toLowerCase() === "manifest.xml");
 
-  const modPathPartsLowerCase = ADDITIONAL_PRODUCTS_PACK_DIR
-    .toLowerCase()
-    .split(sep);
+  const modDirNameLowerCase = basename(ADDITIONAL_PRODUCTS_PACK_DIR)
+    .toLowerCase();
 
   const products = (await Promise.all(manifests.map(async (file) => {
     try {
-      const path = resolve(workingPath, file);
-      const text = await readFile(path, { encoding: "utf8" });
+      const text = await readFile(
+        resolve(workingPath, file),
+        { encoding: "utf8" },
+      );
       const $ = load(text, { xml: true }, false);
       const $root = $(":root").first();
       const $name = $root.find("> Name").first();
-      const dir = basename(dirname(file));
-      const pack = basename(dirname(dirname(file)));
+      if ($root[0]!.name !== "Product" || $name.length !== 1) return false;
 
-      return $root[0]!.name === "Product" && $name.length === 1 && {
-        file,
-        index: file.split(sep).length - 1,
-        destinationDir: join(
-          pack === "." || modPathPartsLowerCase.includes(pack.toLowerCase())
-            ? basename(
-              archivePath || workingPath,
-              extname(archivePath || workingPath),
-            )
-            : pack,
-          dir === "." || modPathPartsLowerCase.includes(dir.toLowerCase())
-            ? $name.text()
-            : dir,
-        ),
-      };
+      const tokens = file.split(sep);
+      const tokensLowerCase = file.toLowerCase().split(sep);
+      const index = tokens.length - 1;
+      const bestPath = archivePath || workingPath;
+      const destinationDirTokens = tokens.slice(
+        tokensLowerCase.indexOf(modDirNameLowerCase) + 1,
+        index,
+      );
+      const destinationDir = join(
+        destinationDirTokens.length > 1
+          ? ""
+          : destinationDirTokens.length === 1
+          ? basename(bestPath, extname(bestPath))
+          : join(basename(bestPath, extname(bestPath)), $name.text()),
+        ...destinationDirTokens,
+      );
+
+      return { file, index, destinationDir };
     } catch {
       return false;
     }
