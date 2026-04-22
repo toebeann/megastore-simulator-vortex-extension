@@ -10,12 +10,13 @@ import { partition } from "lodash";
 import { coerce, satisfies } from "semver";
 import { type types as t, util } from "vortex-api";
 
-import { NEXUS_GAME_ID } from "../constants";
-import { getAssemblyAnalysis } from "../dotnet/getAssemblyAnalysis";
-import { BEPINEX_5_PLUGIN_MOD_TYPE } from "../modTypes/bepinex-5-plugin";
-import { some } from "../util/async";
-import { BEPINEX_CORE_FILES, BEPINEX_PLUGINS_DIR } from "../util/bepinex";
-import { context } from "..";
+import { context } from "@";
+import { NEXUS_GAME_ID } from "@/constants";
+import { getAssemblyAnalysis } from "@/dotnet/getAssemblyAnalysis";
+import { BEPINEX_5_PLUGIN_MOD_TYPE } from "@/modTypes/bepinex-5-plugin";
+import { some } from "@/util/async";
+import { BEPINEX_CORE_FILES, BEPINEX_PLUGINS_DIR } from "@/util/bepinex";
+
 import { install as fallback } from "./fallback";
 
 import isChildPath = util.isChildPath;

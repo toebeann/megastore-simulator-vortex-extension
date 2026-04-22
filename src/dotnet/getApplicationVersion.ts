@@ -6,19 +6,18 @@
 import { quote } from "shell-quote";
 
 // @ts-expect-error
-import script from "../../assets/applicationVersion.fsx" with { type: "file" };
+import script from "assets/applicationVersion.fsx" with { type: "file" };
 // @ts-expect-error
-import tpk from "../../assets/lz4.tpk" with { type: "file" };
-import type { Utils } from "../../DotNetUtils/bin/Release/DotNetUtils";
+import tpk from "assets/lz4.tpk" with { type: "file" };
+import type { Utils } from "DotNetUtils/DotNetUtils";
 // @ts-expect-error
-import dotnetUtils from "../../DotNetUtils/bin/Release/DotNetUtils.dll" with {
-  type: "file",
-};
+import dotnetUtils from "DotNetUtils/DotNetUtils.dll" with { type: "file" };
 // @ts-expect-error
-import "../../DotNetUtils/bin/Release/AssetsTools.NET.dll" with { type: "file" };
+import "DotNetUtils/AssetsTools.NET.dll" with { type: "file" };
 
-import { exec } from "../util/powershell";
-import { resolveExtensionPath } from "../util/resolveExtensionPath";
+import { exec } from "@/util/powershell";
+import { resolveExtensionPath } from "@/util/resolveExtensionPath";
+
 import { dotnet } from ".";
 
 export const getApplicationVersion = (gameDataPath: string) => {

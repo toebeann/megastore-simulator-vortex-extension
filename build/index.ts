@@ -8,7 +8,7 @@ import { build, file, write } from "bun";
 import { parseArgs } from "node:util";
 
 // @ts-expect-error
-import { externals } from "../node_modules/vortex-api/bin/webpack";
+import { externals } from "vortex-webpack-config";
 
 const banner = `/**
  * This Source Code Form is subject to the terms of the

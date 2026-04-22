@@ -4,7 +4,7 @@
  * with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // @ts-expect-error
-import changelogHtml from "../../CHANGELOG.md";
+import changelogHtml from "/CHANGELOG.md";
 
 export const getHtml = () =>
   new HTMLRewriter()

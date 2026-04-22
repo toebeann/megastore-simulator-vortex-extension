@@ -9,9 +9,9 @@ import { globSync, type Options } from "fast-glob";
 import { partition } from "lodash";
 import { type types as t, util } from "vortex-api";
 
-import { NEXUS_GAME_ID } from "../constants";
-import { getDiscovery } from "../util/vortex";
-import { context } from "..";
+import { context } from "@";
+import { NEXUS_GAME_ID } from "@/constants";
+import { getDiscovery } from "@/util/vortex";
 
 import isChildPath = util.isChildPath;
 
