@@ -6,18 +6,18 @@
 import type net9 from "node-api-dotnet/net9.0";
 
 // @ts-expect-error
-import nativeHostPath from "../../node_modules/node-api-dotnet/win-x64/Microsoft.JavaScript.NodeApi.node" with {
+import nativeHostPath from "node-api-dotnet/win-x64/Microsoft.JavaScript.NodeApi.node" with {
   type: "file",
 };
 // @ts-expect-error
-import managedHostPath from "../../node_modules/node-api-dotnet/net9.0/Microsoft.JavaScript.NodeApi.DotNetHost.dll" with {
+import managedHostPath from "node-api-dotnet/net9.0/Microsoft.JavaScript.NodeApi.DotNetHost.dll" with {
   type: "file",
 };
 // @ts-expect-error
-import "../../node_modules/node-api-dotnet/net9.0/Microsoft.JavaScript.NodeApi.dll" with { type: "file" };
-import "../../node_modules/node-api-dotnet/net9.0/Microsoft.JavaScript.NodeApi.runtimeconfig.json" with { type: "file" };
+import "node-api-dotnet/net9.0/Microsoft.JavaScript.NodeApi.dll" with { type: "file" };
+import "node-api-dotnet/net9.0/Microsoft.JavaScript.NodeApi.runtimeconfig.json" with { type: "file" };
 
-import { resolveExtensionPath } from "../util/resolveExtensionPath";
+import { resolveExtensionPath } from "@/util/resolveExtensionPath";
 
 let _dotnet: typeof net9 | undefined = undefined;
 

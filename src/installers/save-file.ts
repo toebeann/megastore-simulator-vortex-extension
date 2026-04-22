@@ -11,13 +11,14 @@ import { partition } from "lodash";
 import { quote } from "shell-quote";
 import { type types as t, util } from "vortex-api";
 
-import { NEXUS_GAME_ID } from "../constants";
-import { SAVE_FILE_MOD_TYPE } from "../modTypes/save-file";
-import { some } from "../util/async";
-import { BEPINEX_CORE_FILES } from "../util/bepinex";
-import { exec } from "../util/powershell";
-import { getPersistentDataPath } from "../util/unity";
-import { context } from "..";
+import { context } from "@";
+import { NEXUS_GAME_ID } from "@/constants";
+import { SAVE_FILE_MOD_TYPE } from "@/modTypes/save-file";
+import { some } from "@/util/async";
+import { BEPINEX_CORE_FILES } from "@/util/bepinex";
+import { exec } from "@/util/powershell";
+import { getPersistentDataPath } from "@/util/unity";
+
 import { install as fallback } from "./fallback";
 
 import isChildPath = util.isChildPath;

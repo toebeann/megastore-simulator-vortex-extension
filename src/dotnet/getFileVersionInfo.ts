@@ -6,8 +6,9 @@
 import { quote } from "shell-quote";
 import { boolean, int, looseObject, optional, string } from "zod/mini";
 
-import { exec } from "../util/powershell";
-import { jsonCodec } from "../util/zod";
+import { exec } from "@/util/powershell";
+import { jsonCodec } from "@/util/zod";
+
 import { dotnet } from ".";
 
 const fileVersionInfoCodec = jsonCodec(

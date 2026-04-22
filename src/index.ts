@@ -6,39 +6,13 @@
 import { feature } from "bun:bundle";
 
 import { resolve } from "node:path";
+import { versions } from "node:process";
 
 import { actions, fs, selectors, type types as t, util } from "vortex-api";
 
 // @ts-expect-error
-import logo from "../assets/gameart.png";
-
-import { version } from "../package.json";
-
-import { register as registerInstallerAdditionalProductsPack } from "./installers/additional-products";
-import { register as registerInstallerBepInEx } from "./installers/bepinex";
-import { register as registerInstallerDll } from "./installers/dll";
-import { register as registerInstallerBepInExConfigFile } from "./installers/bepinex-config-file";
-import { register as registerInstallerFallback } from "./installers/fallback";
-import { register as registerInstallerSaveFile } from "./installers/save-file";
-import {
-  ADDITIONAL_PRODUCTS_PACK_DIR,
-  register as registerModTypeAdditionalProductsPack,
-} from "./modTypes/additional-products";
-import { register as registerModTypeBepInEx } from "./modTypes/bepinex-5";
-import { register as registerModTypeBepInEx5Plugin } from "./modTypes/bepinex-5-plugin";
-import { register as registerModTypeBepInExConfigFile } from "./modTypes/bepinex-config-file";
-import { register as registerModTypeSaveFile } from "./modTypes/save-file";
-
-import { dotnet } from "./dotnet";
-import {
-  BEPINEX_CONFIG_DIR_PATH,
-  BEPINEX_LOG_FILE_PATH,
-  BEPINEX_MOD_PATH,
-  validateBepInEx,
-} from "./util/bepinex";
-import { resolveExtensionPath } from "./util/resolveExtensionPath";
-import { getGameVersion, getPersistentDataPath } from "./util/unity";
-import { getAllMods, getDiscovery, getState } from "./util/vortex";
+import logo from "assets/gameart.png";
+import { version } from "/package.json";
 
 import {
   handle as handleChangelog,
@@ -46,14 +20,38 @@ import {
   show,
   store as changelogStore,
   transform,
-} from "./changelog";
+} from "@/changelog";
 import {
   EXTENSION_NAME,
   GAME_EXE,
   GAME_NAME,
   NEXUS_GAME_ID,
   STEAM_GAME_ID,
-} from "./constants";
+} from "@/constants";
+import { dotnet } from "@/dotnet";
+import { register as registerInstallerAdditionalProductsPack } from "@/installers/additional-products";
+import { register as registerInstallerBepInEx } from "@/installers/bepinex";
+import { register as registerInstallerDll } from "@/installers/dll";
+import { register as registerInstallerBepInExConfigFile } from "@/installers/bepinex-config-file";
+import { register as registerInstallerFallback } from "@/installers/fallback";
+import { register as registerInstallerSaveFile } from "@/installers/save-file";
+import {
+  ADDITIONAL_PRODUCTS_PACK_DIR,
+  register as registerModTypeAdditionalProductsPack,
+} from "@/modTypes/additional-products";
+import { register as registerModTypeBepInEx } from "@/modTypes/bepinex-5";
+import { register as registerModTypeBepInEx5Plugin } from "@/modTypes/bepinex-5-plugin";
+import { register as registerModTypeBepInExConfigFile } from "@/modTypes/bepinex-config-file";
+import { register as registerModTypeSaveFile } from "@/modTypes/save-file";
+import {
+  BEPINEX_CONFIG_DIR_PATH,
+  BEPINEX_LOG_FILE_PATH,
+  BEPINEX_MOD_PATH,
+  validateBepInEx,
+} from "@/util/bepinex";
+import { resolveExtensionPath } from "@/util/resolveExtensionPath";
+import { getGameVersion, getPersistentDataPath } from "@/util/unity";
+import { getAllMods, getDiscovery, getState } from "@/util/vortex";
 
 import ensureDirWritableAsync = fs.ensureDirWritableAsync;
 import currentGame = selectors.currentGame;
@@ -192,6 +190,7 @@ export default function main(_context: t.IExtensionContext): boolean {
     if (feature("DEVTOOLS")) {
       Object.assign(globalThis, {
         [NEXUS_GAME_ID]: {
+          versions,
           context,
           extension: context?.api.extension,
           changelog: {

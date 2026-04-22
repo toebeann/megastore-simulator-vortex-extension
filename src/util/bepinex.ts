@@ -8,9 +8,10 @@ import { join, resolve } from "node:path";
 import { access } from "fs-extra";
 import { util } from "vortex-api";
 
-import { BEPINEX_5_MOD_TYPE } from "../modTypes/bepinex-5";
+import { context } from "@";
+import { NEXUS_GAME_ID } from "@/constants";
+import { BEPINEX_5_MOD_TYPE } from "@/modTypes/bepinex-5";
 
-import { NEXUS_GAME_ID } from "../constants";
 import {
   getDisabledMods,
   getDiscovery,
@@ -20,7 +21,6 @@ import {
   setModsEnabled,
   TRANSLATION_OPTIONS,
 } from "./vortex";
-import { context } from "..";
 
 import opn = util.opn;
 

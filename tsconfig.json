@@ -8,6 +8,15 @@
     "jsx": "react-jsx",
     "allowJs": true,
     "types": ["bun", "fs-extra", "lodash", "node", "semver", "shell-quote"],
+    "paths": {
+      "@": ["./src/index"],
+      "@/*": ["./src/*"],
+      "/*": ["./*"],
+      "assets/*": ["./assets/*"],
+      "DotNetUtils/*": ["./DotNetUtils/bin/Release/*"],
+      "node-api-dotnet/*": ["./node_modules/node-api-dotnet/*"],
+      "vortex-webpack-config": ["./node_modules/vortex-api/bin/webpack"],
+    },
 
     // Bundler mode
     "moduleResolution": "bundler",

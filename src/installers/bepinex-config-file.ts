@@ -9,11 +9,12 @@ import { isBinaryFile } from "isbinaryfile";
 import { partition } from "lodash";
 import { type types as t, util } from "vortex-api";
 
-import { NEXUS_GAME_ID } from "../constants";
-import { BEPINEX_CONFIG_FILE_MOD_TYPE } from "../modTypes/bepinex-config-file";
-import { some } from "../util/async";
-import { BEPINEX_CONFIG_DIR, BEPINEX_CORE_FILES } from "../util/bepinex";
-import { context } from "..";
+import { context } from "@";
+import { NEXUS_GAME_ID } from "@/constants";
+import { BEPINEX_CONFIG_FILE_MOD_TYPE } from "@/modTypes/bepinex-config-file";
+import { some } from "@/util/async";
+import { BEPINEX_CONFIG_DIR, BEPINEX_CORE_FILES } from "@/util/bepinex";
+
 import { install as fallback } from "./fallback";
 
 import isChildPath = util.isChildPath;

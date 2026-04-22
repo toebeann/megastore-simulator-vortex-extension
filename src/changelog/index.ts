@@ -8,8 +8,9 @@ import { gte, lt, major, valid } from "semver";
 import store2 from "store2";
 import * as z from "zod/mini";
 
-import { context } from "..";
-import { EXTENSION_ID, EXTENSION_NAME } from "../constants";
+import { context } from "@";
+import { EXTENSION_ID, EXTENSION_NAME } from "@/constants";
+
 import { getHtml } from "./macro" with { type: "macro" };
 
 export const store = store2

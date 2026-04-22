@@ -7,16 +7,16 @@ import { quote } from "shell-quote";
 import { array, object, string } from "zod/mini";
 
 // @ts-expect-error
-import script from "../../assets/analyzeAssembly.fsx" with { type: "file" };
-import type { Utils } from "../../DotNetUtils/bin/Release/DotNetUtils";
-// @ts-expect-error
-import dotnetUtils from "../../DotNetUtils/bin/Release/DotNetUtils.dll" with {
-  type: "file",
-};
+import script from "assets/analyzeAssembly.fsx" with { type: "file" };
 
-import { exec } from "../util/powershell";
-import { resolveExtensionPath } from "../util/resolveExtensionPath";
-import { jsonCodec } from "../util/zod";
+// @ts-expect-error
+import dotnetUtils from "DotNetUtils/DotNetUtils.dll" with { type: "file" };
+import type { Utils } from "DotNetUtils/DotNetUtils";
+
+import { exec } from "@/util/powershell";
+import { resolveExtensionPath } from "@/util/resolveExtensionPath";
+import { jsonCodec } from "@/util/zod";
+
 import { dotnet } from ".";
 
 const typeRefSchema = object({ Namespace: string(), Name: string() });

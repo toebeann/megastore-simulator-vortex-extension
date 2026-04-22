@@ -8,7 +8,8 @@ import { resolve } from "node:path";
 import { readFile } from "fs-extra";
 import parseAcf from "steam-acf-parser";
 
-import { STEAM_GAME_ID } from "../constants";
+import { STEAM_GAME_ID } from "@/constants";
+
 import { getDiscovery } from "./vortex";
 import { nonEmptyStringSchema } from "./zod";
 

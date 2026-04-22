@@ -5,10 +5,10 @@
  */
 import type { types as t } from "vortex-api";
 
-import { NEXUS_GAME_ID } from "../constants";
-import { validSaveFiles } from "../installers/save-file";
-import { getPersistentDataPath } from "../util/unity";
-import { context } from "..";
+import { context } from "@";
+import { NEXUS_GAME_ID } from "@/constants";
+import { validSaveFiles } from "@/installers/save-file";
+import { getPersistentDataPath } from "@/util/unity";
 
 export const SAVE_FILE_MOD_TYPE = "save-file";
 

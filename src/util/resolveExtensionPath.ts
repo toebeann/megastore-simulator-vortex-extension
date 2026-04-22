@@ -5,7 +5,7 @@
  */
 import { resolve } from "node:path";
 
-import { context } from "..";
+import { context } from "@";
 
 export const resolveExtensionPath = (path: string) =>
   resolve(context?.api.extension?.path ?? "", path);

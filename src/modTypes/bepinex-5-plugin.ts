@@ -7,14 +7,14 @@ import { basename, extname, resolve } from "node:path";
 
 import { type types as t, util } from "vortex-api";
 
-import { NEXUS_GAME_ID } from "../constants";
+import { context } from "@";
+import { NEXUS_GAME_ID } from "@/constants";
 import {
   BEPINEX_CORE_FILES,
   BEPINEX_DIR,
   BEPINEX_MOD_PATH,
-} from "../util/bepinex";
-import { getDiscovery } from "../util/vortex";
-import { context } from "..";
+} from "@/util/bepinex";
+import { getDiscovery } from "@/util/vortex";
 
 import isChildPath = util.isChildPath;
 

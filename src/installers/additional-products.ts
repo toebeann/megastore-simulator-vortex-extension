@@ -4,13 +4,14 @@ import { load } from "cheerio";
 import { readFile } from "fs-extra";
 import { type types as t, util } from "vortex-api";
 
-import { NEXUS_GAME_ID } from "../constants";
+import { context } from "@";
+import { NEXUS_GAME_ID } from "@/constants";
 import {
   ADDITIONAL_PRODUCTS_PACK_DIR,
   ADDITIONAL_PRODUCTS_PACK_MOD_TYPE,
-} from "../modTypes/additional-products";
-import { BEPINEX_CORE_FILES } from "../util/bepinex";
-import { context } from "..";
+} from "@/modTypes/additional-products";
+import { BEPINEX_CORE_FILES } from "@/util/bepinex";
+
 import { install as fallback } from "./fallback";
 
 import isChildPath = util.isChildPath;

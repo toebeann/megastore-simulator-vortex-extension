@@ -13,9 +13,9 @@ import {
   GAME_EXE,
   GAME_NAME,
   GAME_PUBLISHER,
-} from "../constants";
-import { getApplicationVersion } from "../dotnet/getApplicationVersion";
-import { getFileVersionInfo } from "../dotnet/getFileVersionInfo";
+} from "@/constants";
+import { getApplicationVersion } from "@/dotnet/getApplicationVersion";
+import { getFileVersionInfo } from "@/dotnet/getFileVersionInfo";
 
 import { getDiscovery } from "./vortex";
 import { nonEmptyStringSchema } from "./zod";

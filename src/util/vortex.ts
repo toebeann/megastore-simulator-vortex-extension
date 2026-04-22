@@ -6,8 +6,8 @@
 import type { IFileInfo } from "@nexusmods/nexus-api";
 import { actions, selectors, type types as t, util } from "vortex-api";
 
-import { GAME_NAME, NEXUS_GAME_ID } from "../constants";
-import { context } from "..";
+import { context } from "@";
+import { GAME_NAME, NEXUS_GAME_ID } from "@/constants";
 
 import _setModsEnabled = actions.setModsEnabled;
 import currentGame = selectors.currentGame;

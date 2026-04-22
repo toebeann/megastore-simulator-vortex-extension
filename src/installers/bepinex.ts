@@ -7,13 +7,13 @@ import { join, sep } from "node:path";
 
 import type { types as t } from "vortex-api";
 
-import { NEXUS_GAME_ID } from "../constants";
+import { context } from "@";
+import { NEXUS_GAME_ID } from "@/constants";
 import {
   BEPINEX_CORE_DIR,
   BEPINEX_CORE_FILES,
   BEPINEX_DIR,
-} from "../util/bepinex";
-import { context } from "..";
+} from "@/util/bepinex";
 
 export const testSupported: t.TestSupported = async (files, gameId) => {
   const result: t.ISupportedResult = { requiredFiles: [], supported: false };
