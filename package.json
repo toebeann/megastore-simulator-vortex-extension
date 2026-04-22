@@ -71,10 +71,8 @@
     "jszip": "^3.10.1",
     "node-api-dotnet": "^0.9.19",
     "steam-acf-parser": "github:mattb-prg/steam-acf-parser",
+    "typescript": "^6.0.3",
     "vortex-api": "github:Nexus-Mods/vortex-api"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
   },
   "engines": {
     "bun": "^1.3.13"
