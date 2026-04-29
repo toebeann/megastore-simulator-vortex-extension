@@ -7,6 +7,7 @@ import { build, file, write } from "bun";
 
 import { parseArgs } from "node:util";
 
+import { z } from "zod";
 // @ts-expect-error
 import { externals } from "vortex-webpack-config";
 
@@ -30,7 +31,7 @@ const { values: config } = parseArgs({
 await build({
   entrypoints: ["src/index"],
   outdir: "dist",
-  external: Object.values(externals()),
+  external: Object.values(z.record(z.string(), z.string()).parse(externals())),
   target: "node",
   sourcemap: "inline",
   define: { "process.env.NODE_ENV": JSON.stringify("production") },
