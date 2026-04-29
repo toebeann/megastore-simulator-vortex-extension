@@ -1,7 +1,7 @@
 import { basename, dirname, extname, join, resolve, sep } from "node:path";
 
 import { load } from "cheerio";
-import { readFile } from "fs-extra";
+import { readFileSync } from "fs-extra";
 import { type types as t, util } from "vortex-api";
 
 import { context } from "@";
@@ -38,6 +38,8 @@ export const testSupported: t.TestSupported = async (files, gameId) => {
   return result;
 };
 
+type ProductData = { file: string; index: number; destinationDir: string };
+
 export const install: t.InstallFunc = async (
   files,
   workingPath,
@@ -55,39 +57,39 @@ export const install: t.InstallFunc = async (
   const modDirNameLowerCase = basename(ADDITIONAL_PRODUCTS_PACK_DIR)
     .toLowerCase();
 
-  const products = (await Promise.all(manifests.map(async (file) => {
+  const products = manifests.reduce<ProductData[]>((results, file) => {
     try {
-      const text = await readFile(
+      const text = readFileSync(
         resolve(workingPath, file),
         { encoding: "utf8" },
       );
       const $ = load(text, { xml: true }, false);
       const $root = $(":root").first();
       const $name = $root.find("> Name").first();
-      if ($root[0]!.name !== "Product" || $name.length !== 1) return false;
+      if ($root[0]!.name === "Product" && $name.length === 1) {
+        const tokens = file.split(sep);
+        const tokensLowerCase = file.toLowerCase().split(sep);
+        const index = tokens.length - 1;
+        const bestPath = archivePath || workingPath;
+        const destinationDirTokens = tokens.slice(
+          tokensLowerCase.indexOf(modDirNameLowerCase) + 1,
+          index,
+        );
+        const destinationDir = join(
+          destinationDirTokens.length > 1
+            ? ""
+            : destinationDirTokens.length === 1
+            ? basename(bestPath, extname(bestPath))
+            : join(basename(bestPath, extname(bestPath)), $name.text()),
+          ...destinationDirTokens,
+        );
 
-      const tokens = file.split(sep);
-      const tokensLowerCase = file.toLowerCase().split(sep);
-      const index = tokens.length - 1;
-      const bestPath = archivePath || workingPath;
-      const destinationDirTokens = tokens.slice(
-        tokensLowerCase.indexOf(modDirNameLowerCase) + 1,
-        index,
-      );
-      const destinationDir = join(
-        destinationDirTokens.length > 1
-          ? ""
-          : destinationDirTokens.length === 1
-          ? basename(bestPath, extname(bestPath))
-          : join(basename(bestPath, extname(bestPath)), $name.text()),
-        ...destinationDirTokens,
-      );
-
-      return { file, index, destinationDir };
-    } catch {
-      return false;
+        results.push({ file, index, destinationDir });
+      }
+    } finally {
+      return results;
     }
-  }))).filter(Boolean);
+  }, []);
 
   // no valid product manifests detected, use the fallback installer instead
   if (!products.length) {
@@ -106,20 +108,24 @@ export const install: t.InstallFunc = async (
   return {
     instructions: [
       { type: "setmodtype", value: ADDITIONAL_PRODUCTS_PACK_MOD_TYPE },
-      ...sansDirectories.map((source) => {
+      ...sansDirectories.reduce<t.IInstruction[]>((instructions, source) => {
         const product = products.find(({ file }) =>
           dirname(source) === dirname(file) ||
           isChildPath(source, dirname(file))
         );
-        if (!product) return false;
-
-        const { destinationDir, index } = product;
-        return {
-          type: "copy",
-          source,
-          destination: join(destinationDir, ...source.split(sep).slice(index)),
-        } satisfies t.IInstruction;
-      }).filter(Boolean),
+        if (product) {
+          const { destinationDir, index } = product;
+          instructions.push({
+            type: "copy",
+            source,
+            destination: join(
+              destinationDir,
+              ...source.split(sep).slice(index),
+            ),
+          });
+        }
+        return instructions;
+      }, []),
     ],
   };
 };
