@@ -28,7 +28,7 @@ export const getGameVersion = (gamePath = getDiscovery()?.path) => {
     if (applicationVersion) return applicationVersion;
 
     for (const path of [GAME_EXE, "UnityPlayer.dll"]) {
-      const info = getFileVersionInfo(resolve(path, path));
+      const info = getFileVersionInfo(resolve(gamePath, path));
       const version = info?.ProductVersion || info?.FileVersion;
       if (version) return version;
     }
