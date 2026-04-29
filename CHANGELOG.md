@@ -4,9 +4,9 @@
 
 ### Fixed
 
-- Fix potential leak when detecting game version ([`e37b59a`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/e37b59a))
-- Fix potential error detecting game version in some rare situations ([`5e1d2c2`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/5e1d2c2))
-- Correctly detect breaking changes when displaying changelogs ([`db2b3f0`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/db2b3f0))
+- Fix potential leak when detecting game version by [@IDCs] ([`e37b59a`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/e37b59a))
+- Fix potential error detecting game version in some rare situations by [@IDCs] ([`5e1d2c2`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/5e1d2c2))
+- Correctly detect breaking changes when displaying changelogs by [@IDCs] ([`db2b3f0`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/db2b3f0))
 
 ## [1.3.6] - 2026-04-22
 
@@ -96,3 +96,4 @@ _Initial release 🚀_
 [1.1.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.1.0
 [1.0.0]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.0.0
 [Additional Products]: https://www.nexusmods.com/megastoresimulator/mods/34
+[@IDCs]: https://github.com/IDCs
