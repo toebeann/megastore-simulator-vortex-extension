@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.7] - 2026-04-29
+
+### Fixed
+
+- Fix potential leak when detecting game version ([`e37b59a`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/e37b59a))
+- Fix potential error detecting game version in some rare situations ([`5e1d2c2`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/5e1d2c2))
+- Correctly detect breaking changes when displaying changelogs ([`db2b3f0`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/db2b3f0))
+
 ## [1.3.6] - 2026-04-22
 
 ### Changed
@@ -75,6 +83,7 @@ _This update is functionally equivalent to [1.3.2], with just the game art conve
 
 _Initial release 🚀_
 
+[1.3.7]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.7
 [1.3.6]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.6
 [1.3.5]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.5
 [1.3.4]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.4
