@@ -88,8 +88,8 @@ export const transform = (config?: Partial<TransformConfig>) => {
       // has notice?
       $("summary + p > em", current).first().text().length ||
       // has breaking change?
-      $("li > strong:first-of-type", current).filter(() =>
-        $(this).text().toLowerCase().includes("breaking")
+      $("li > strong:first-of-type", current).filter((_, element) =>
+        $(element).text().toLowerCase().includes("breaking")
       ).length;
 
     if (!shouldOpen) continue;
