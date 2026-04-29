@@ -99,7 +99,7 @@ public static class Utils
         var result = new AssemblyAnalysis(
             Assembly: definition.GetAssemblyName(),
 
-            BepInExAssemblies: bepinex,
+            References: references,
 
             BepInExPatcherTypes: bepinex switch
             {

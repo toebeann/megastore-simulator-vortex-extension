@@ -25,7 +25,7 @@ const assemblyRefSchema = object({ Name: string(), Version: string() });
 
 const analyzeAssemblyResultSchema = object({
   Assembly: assemblyRefSchema,
-  BepInExAssemblies: array(assemblyRefSchema),
+  References: array(assemblyRefSchema),
   BepInExPatcherTypes: array(typeRefSchema),
   BepInExPluginTypes: array(typeRefSchema),
 });

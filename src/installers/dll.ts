@@ -52,9 +52,9 @@ export const install: t.InstallFunc = async (files, workingPath, ...rest) => {
     const analysis = getAssemblyAnalysis(resolve(workingPath, file));
     if (!analysis) return false;
 
-    const { BepInExAssemblies, BepInExPluginTypes } = analysis;
+    const { References, BepInExPluginTypes } = analysis;
     return BepInExPluginTypes.length &&
-      BepInExAssemblies.some(({ Name, Version }) =>
+      References.some(({ Name, Version }) =>
         Name === "BepInEx" && satisfies(coerce(Version) ?? "0", "^5")
       );
   })!;

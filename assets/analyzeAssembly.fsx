@@ -119,7 +119,7 @@ let getBepInExReferences (refs: AssemblyRef seq) =
 
 type output =
     { Assembly: AssemblyRef
-      BepInExAssemblies: AssemblyRef seq
+      References: AssemblyRef seq
       BepInExPatcherTypes: TypeRef seq
       BepInExPluginTypes: TypeRef seq }
 
@@ -143,7 +143,7 @@ using (new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
             { Name = s def.Name reader
               Version = def.Version }
 
-          BepInExAssemblies = bepinex
+          References = refs
 
           BepInExPatcherTypes =
             match bepinex with

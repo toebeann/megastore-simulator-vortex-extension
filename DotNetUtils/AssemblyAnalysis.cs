@@ -7,6 +7,6 @@ namespace DotNetUtils;
 
 public record AssemblyAnalysis(
     AssemblyRef Assembly,
-    IEnumerable<AssemblyRef> BepInExAssemblies,
+    IEnumerable<AssemblyRef> References,
     IEnumerable<TypeRef> BepInExPatcherTypes,
     IEnumerable<TypeRef> BepInExPluginTypes);
