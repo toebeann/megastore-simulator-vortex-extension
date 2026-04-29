@@ -17,35 +17,41 @@ public static class Utils
     public static string? GetApplicationVersion(string gameDataPath, string tpkPath)
     {
         var manager = new AssetsManager();
-        var instance = gameDataPath switch
+        try
         {
-            string path when File.Exists(Path.Combine(path, "globalgamemanagers")) =>
-                manager.LoadAssetsFile(Path.Combine(path, "globalgamemanagers")),
+            var instance = gameDataPath switch
+            {
+                string path when File.Exists(Path.Combine(path, "globalgamemanagers")) =>
+                    manager.LoadAssetsFile(Path.Combine(path, "globalgamemanagers")),
 
-            string path when File.Exists(Path.Combine(path, "mainData")) =>
-                manager.LoadAssetsFile(Path.Combine(path, "mainData")),
+                string path when File.Exists(Path.Combine(path, "mainData")) =>
+                    manager.LoadAssetsFile(Path.Combine(path, "mainData")),
 
-            string path => manager.LoadAssetsFileFromBundle(
-                manager.LoadBundleFile(Path.Combine(path, "data.unity3d")),
-                "globalgamemanagers"),
-        };
+                string path => manager.LoadAssetsFileFromBundle(
+                    manager.LoadBundleFile(Path.Combine(path, "data.unity3d")),
+                    "globalgamemanagers"),
+            };
 
-        manager.LoadClassPackage(tpkPath);
+            manager.LoadClassPackage(tpkPath);
 
-        if (!instance.file.Metadata.TypeTreeEnabled)
-            manager.LoadClassDatabaseFromPackage(instance.file.Metadata.UnityVersion);
+            if (!instance.file.Metadata.TypeTreeEnabled)
+                manager.LoadClassDatabaseFromPackage(instance.file.Metadata.UnityVersion);
 
-        var playerSettings = instance.file.GetAssetsOfType(AssetClassID.PlayerSettings).First();
-        var baseField = manager.GetBaseField(instance, playerSettings);
+            var playerSettings = instance.file.GetAssetsOfType(AssetClassID.PlayerSettings).First();
+            var baseField = manager.GetBaseField(instance, playerSettings);
 
-        var result = baseField?.Get("bundleVersion") switch
+            var result = baseField?.Get("bundleVersion") switch
+            {
+                { TypeName: "string", AsString: var str } => str,
+                _ => null
+            };
+
+            return result;
+        }
+        finally
         {
-            { TypeName: "string", AsString: var str } => str,
-            _ => null
-        };
-
-        manager.UnloadAll(true);
-        return result;
+            manager.UnloadAll(true);
+        }
     }
 
     private static string? GetFullName(CustomAttribute attribute, MetadataReader reader)
