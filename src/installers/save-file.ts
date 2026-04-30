@@ -5,6 +5,7 @@
  */
 import { basename, dirname, join, resolve, sep } from "node:path";
 
+import { some } from "async-es";
 import { stat } from "fs-extra";
 import { isBinaryFile } from "isbinaryfile";
 import { partition } from "lodash";
@@ -14,7 +15,6 @@ import { type types as t, util } from "vortex-api";
 import { context } from "@";
 import { NEXUS_GAME_ID } from "@/constants";
 import { SAVE_FILE_MOD_TYPE } from "@/modTypes/save-file";
-import { some } from "@/util/async";
 import { BEPINEX_CORE_FILES } from "@/util/bepinex";
 import { exec } from "@/util/powershell";
 import { getPersistentDataPath } from "@/util/unity";
@@ -81,7 +81,12 @@ export const install: t.InstallFunc = async (files, workingPath, ...rest) => {
   );
 
   // if any binary files found outside folder containing save file, we don't support this archive
-  if (await some(outside, (file) => isBinaryFile(resolve(workingPath, file)))) {
+  if (
+    await some(
+      outside,
+      (file) => isBinaryFile(resolve(workingPath, file)).catch(() => false),
+    )
+  ) {
     return fallback(files, workingPath, ...rest);
   }
 

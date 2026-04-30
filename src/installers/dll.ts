@@ -5,6 +5,7 @@
  */
 import { basename, dirname, extname, join, resolve, sep } from "node:path";
 
+import { some } from "async-es";
 import { isBinaryFile } from "isbinaryfile";
 import { partition } from "lodash";
 import { coerce, satisfies } from "semver";
@@ -14,7 +15,6 @@ import { context } from "@";
 import { NEXUS_GAME_ID } from "@/constants";
 import { getAssemblyAnalysis } from "@/dotnet/getAssemblyAnalysis";
 import { BEPINEX_5_PLUGIN_MOD_TYPE } from "@/modTypes/bepinex-5-plugin";
-import { some } from "@/util/async";
 import { BEPINEX_CORE_FILES, BEPINEX_PLUGINS_DIR } from "@/util/bepinex";
 
 import { install as fallback } from "./fallback";
@@ -77,7 +77,12 @@ export const install: t.InstallFunc = async (files, workingPath, ...rest) => {
   );
 
   // if any binary files found outside BepInEx\plugins, we don't support this archive
-  if (await some(outside, (file) => isBinaryFile(resolve(workingPath, file)))) {
+  if (
+    await some(
+      outside,
+      (file) => isBinaryFile(resolve(workingPath, file)).catch(() => false),
+    )
+  ) {
     return fallback(files, workingPath, ...rest);
   }
 

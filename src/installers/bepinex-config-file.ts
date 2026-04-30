@@ -5,6 +5,7 @@
  */
 import { basename, dirname, extname, join, resolve, sep } from "node:path";
 
+import { some } from "async-es";
 import { isBinaryFile } from "isbinaryfile";
 import { partition } from "lodash";
 import { type types as t, util } from "vortex-api";
@@ -12,7 +13,6 @@ import { type types as t, util } from "vortex-api";
 import { context } from "@";
 import { NEXUS_GAME_ID } from "@/constants";
 import { BEPINEX_CONFIG_FILE_MOD_TYPE } from "@/modTypes/bepinex-config-file";
-import { some } from "@/util/async";
 import { BEPINEX_CONFIG_DIR, BEPINEX_CORE_FILES } from "@/util/bepinex";
 
 import { install as fallback } from "./fallback";
@@ -60,7 +60,12 @@ export const install: t.InstallFunc = async (files, workingPath, ...rest) => {
   );
 
   // if any binary files found outside BepInEx\config, we don't support this archive
-  if (await some(outside, (file) => isBinaryFile(resolve(workingPath, file)))) {
+  if (
+    await some(
+      outside,
+      (file) => isBinaryFile(resolve(workingPath, file)).catch(() => false),
+    )
+  ) {
     return fallback(files, workingPath, ...rest);
   }
 
