@@ -49,7 +49,8 @@ export const install: t.InstallFunc = async (files) => {
     onlyDirectories: true,
   };
 
-  const sourcemap = onlyDirs.reduce((map, directory) => {
+  const sourcemap = new Map<string, number>();
+  for (const directory of onlyDirs) {
     const base = basename(directory);
     const trimmed = join(dirname(directory), base);
     const tokens = trimmed.split(sep);
@@ -66,43 +67,39 @@ export const install: t.InstallFunc = async (files) => {
         join(...matchTokens.slice(0, index)),
       ]);
 
-      map.set(key, (map.get(key) ?? 0) + index);
+      sourcemap.set(key, (sourcemap.get(key) ?? 0) + index);
     }
-    return map;
-  }, new Map<string, number>());
+  }
 
   const sorted = Array.from(sourcemap.entries())
     .sort(([_, a], [__, b]) => a - b);
 
-  return {
-    instructions: [
-      { type: "setmodtype", value: "dinput" },
-      ...onlyFiles.reduce((instructions, source) => {
-        const map = sorted.find(([key]) => {
-          const [sourceDir] = JSON.parse(key) as [string, string];
-          return sourceDir === "." ||
-            isChildPath(source.toLowerCase(), sourceDir);
-        });
+  const instructions: t.IInstruction[] = [{
+    type: "setmodtype",
+    value: "dinput",
+  }];
 
-        if (map) {
-          const [key] = map;
-          const [sourceDir, destinationDir] = JSON.parse(key) as [
-            string,
-            string,
-          ];
-          const tokens = source.split(sep);
-          const { length } = sourceDir.split(sep);
-          const destination = join(
-            destinationDir,
-            sourceDir === "." ? source : join(...tokens.slice(length)),
-          );
-          instructions.push({ type: "copy", source, destination });
-        }
+  for (const source of onlyFiles) {
+    const map = sorted.find(([key]) => {
+      const [sourceDir] = JSON.parse(key) as [string, string];
+      return sourceDir === "." ||
+        isChildPath(source.toLowerCase(), sourceDir);
+    });
 
-        return instructions;
-      }, [] as t.IInstruction[]),
-    ],
-  };
+    if (!map) continue;
+
+    const [key] = map;
+    const [sourceDir, destinationDir] = JSON.parse(key) as [string, string];
+    const tokens = source.split(sep);
+    const { length } = sourceDir.split(sep);
+    const destination = join(
+      destinationDir,
+      sourceDir === "." ? source : join(...tokens.slice(length)),
+    );
+    instructions.push({ type: "copy", source, destination });
+  }
+
+  return { instructions };
 };
 
 export const register = () =>
