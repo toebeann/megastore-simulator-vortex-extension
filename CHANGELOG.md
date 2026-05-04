@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.8] - 2026-05-04
+
+### Fixed
+
+- Correctly install BepInEx plugins when their archive does not include a `plugins` folder ([`804317c`](https://github.com/toebeann/megastore-simulator-vortex-extension/commit/804317c))
+
 ## [1.3.7] - 2026-04-29
 
 ### Fixed
@@ -83,6 +89,7 @@ _This update is functionally equivalent to [1.3.2], with just the game art conve
 
 _Initial release 🚀_
 
+[1.3.8]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.8
 [1.3.7]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.7
 [1.3.6]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.6
 [1.3.5]: https://github.com/toebeann/megastore-simulator-vortex-extension/releases/tag/v1.3.5
