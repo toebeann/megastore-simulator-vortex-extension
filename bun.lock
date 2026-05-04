@@ -12,7 +12,7 @@
         "lodash": "^4.18.1",
         "shell-quote": "^1.8.3",
         "store2": "^2.14.4",
-        "zod": "^4.4.1",
+        "zod": "^4.4.3",
       },
       "devDependencies": {
         "@nexusmods/nexus-api": "^1.1.5",
@@ -306,13 +306,13 @@
 
     "verror": ["verror@1.10.0", "", { "dependencies": { "assert-plus": "^1.0.0", "core-util-is": "1.0.2", "extsprintf": "^1.2.0" } }, "sha512-ZZKSmDAEFOijERBLkmYfJ+vmk3w+7hOLYDNkRCuRuMJGEmqYNCNLyBBFwWKVMhfwaEF3WOd0Zlw86U/WC/+nYw=="],
 
-    "vortex-api": ["vortex-api@github:Nexus-Mods/vortex-api#4659575", { "bin": { "extractInfo": "./bin/extractInfo.js" } }, "Nexus-Mods-vortex-api-4659575", "sha512-1muBm2+xctynYwroWATD5WqwDkeu/O+PrE7y22LVjmRyu7oJLrm0fiEPK4wE0ciuakSa5lsPbhT7AJblqvt5+g=="],
+    "vortex-api": ["vortex-api@github:Nexus-Mods/vortex-api#012ea3b", { "bin": { "extractInfo": "./bin/extractInfo.js" } }, "Nexus-Mods-vortex-api-012ea3b", "sha512-eBZfRAZg0rWfs9IqNl9VRl30ha4LNEpN/T1IvMDPEBIc0zY63L104yNSAqoSOlI9wcLzR9OE/viZiXJ9R1bvMQ=="],
 
     "whatwg-encoding": ["whatwg-encoding@3.1.1", "", { "dependencies": { "iconv-lite": "0.6.3" } }, "sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ=="],
 
     "whatwg-mimetype": ["whatwg-mimetype@4.0.0", "", {}, "sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg=="],
 
-    "zod": ["zod@4.4.1", "", {}, "sha512-a6ENMBBGZBsnlSebQ/eKCguSBeGKSf4O7BPnqVPmYGtpBYI7VSqoVqw+QcB7kPRjbqPwhYTpFbVj/RqNz/CT0Q=="],
+    "zod": ["zod@4.4.3", "", {}, "sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ=="],
 
     "htmlparser2/entities": ["entities@7.0.1", "", {}, "sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA=="],
 
