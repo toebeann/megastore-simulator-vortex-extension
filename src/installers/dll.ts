@@ -73,7 +73,10 @@ export const install: t.InstallFunc = async (files, workingPath, ...rest) => {
 
   const [rooted, outside] = partition(
     sansDirectories,
-    (file) => dirname(file) === rootDir || isChildPath(file, rootDir),
+    (file) =>
+      rootIndex === -1 ||
+      dirname(file) === rootDir ||
+      isChildPath(file, rootDir),
   );
 
   // if any binary files found outside BepInEx\plugins, we don't support this archive
